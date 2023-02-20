@@ -1,0 +1,29 @@
+[
+  {
+    "_id": "81d44e53-2ad8-4b8f-91d2-5cf4f1ae15bd",
+    "colName": "Clockify",
+    "created": "2023-02-20T03:44:36.235Z",
+    "sortNum": 10000,
+    "folders": [
+      {
+        "_id": "7ab0638c-2ff5-4b64-9993-b7ac98f09827",
+        "name": "workspaces",
+        "containerId": "",
+        "created": "2023-02-20T03:45:22.575Z",
+        "sortNum": 10000
+      }
+    ],
+    "settings": {
+      "headers": [
+        {
+          "name": "X-Api-Key",
+          "value": "XJgJwWm3zC11IWDq"
+        }
+      ],
+      "tests": [],
+      "options": {
+        "baseUrl": "https://api.clockify.me/api/v1"
+      }
+    }
+  }
+]

@@ -1,0 +1,16 @@
+[
+  {
+    "_id": "792d421c-469b-46d5-876a-6dc73725eba1",
+    "colId": "81d44e53-2ad8-4b8f-91d2-5cf4f1ae15bd",
+    "containerId": "7ab0638c-2ff5-4b64-9993-b7ac98f09827",
+    "name": "Get all my workspaces",
+    "url": "/workspaces",
+    "method": "GET",
+    "sortNum": 40000,
+    "created": "2023-02-20T03:45:36.852Z",
+    "modified": "2023-02-20T03:48:37.882Z",
+    "headers": [],
+    "params": [],
+    "tests": []
+  }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "_id": "da043952-d020-4c60-b99d-5c4b1c05c551",
+    "name": "env",
+    "default": true,
+    "sortNum": 10000,
+    "created": "2023-02-20T03:43:56.368Z",
+    "modified": "2023-02-20T03:43:56.368Z",
+    "data": [
+      {
+        "name": "host",
+        "value": "https://api.clockify.me/api/v1"
+      },
+      {
+        "name": "token",
+        "value": "XJgJwWm3zC11IWDq"
+      }
+    ]
+  }
+]
