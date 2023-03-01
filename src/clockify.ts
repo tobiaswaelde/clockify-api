@@ -16,6 +16,12 @@ import {
 	UpdateClientRequestData,
 } from './types/client';
 import {
+	CustomField,
+	GetProjectCustomFieldsParams,
+	GetWorkspaceCustomFieldsParams,
+	SetCustomFieldRequiredRequestData,
+} from './types/custom-fields';
+import {
 	GetWebhooksParams,
 	Webhook,
 	CreateWebhookRequestData,
@@ -226,7 +232,7 @@ export class Clockify {
 	}
 	//#endregion
 	//#region Clients
-	public static async findClientsOnWorkspace(
+	public static async getClients(
 		workspaceId: string,
 		options?: GetClientsParams
 	): Promise<Client[]> {
@@ -259,6 +265,62 @@ export class Clockify {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
 		const res = await this.http.put(`/v1/workspaces/${workspaceId}/clients/${clientId}?${q}`, data);
 		return res.data satisfies Client;
+	}
+	//#endregion
+	//#region Custom Fields
+	public static async getWorkspceCustomFields(
+		workspaceId: string,
+		options?: GetWorkspaceCustomFieldsParams
+	): Promise<CustomField[]> {
+		const q = qs.stringify(options, { encodeValuesOnly: true });
+		const res = await this.http.get(`/v1/workspaces/${workspaceId}/custom-fields?${q}`);
+		return res.data satisfies CustomField[];
+	}
+
+	public static async setCustomFieldAsRequired(
+		workspaceId: string,
+		customFieldId: string,
+		data: SetCustomFieldRequiredRequestData
+	): Promise<CustomField> {
+		const res = await this.http.put(
+			`/v1/workspaces/${workspaceId}/custom-fields/${customFieldId}`,
+			data
+		);
+		return res.data satisfies CustomField;
+	}
+
+	public static async getCustomFields(
+		workspaceId: string,
+		projectId: string,
+		options?: GetProjectCustomFieldsParams
+	): Promise<CustomField[]> {
+		const q = qs.stringify(options, { encodeValuesOnly: true });
+		const res = await this.http.get(
+			`/v1/workspaces/${workspaceId}/projects/${projectId}/custom-fields?${q}`
+		);
+		return res.data satisfies CustomField[];
+	}
+
+	public static async removeCustomField(
+		workspaceId: string,
+		projectId: string,
+		customFieldId: string
+	): Promise<CustomField> {
+		const res = await this.http.delete(
+			`/v1/workspaces/${workspaceId}/projects/${projectId}/custom-fields`
+		);
+		return res.data satisfies CustomField;
+	}
+
+	public static async updateCustomField(
+		workspaceId: string,
+		projectId: string,
+		customFieldId: string
+	): Promise<CustomField> {
+		const res = await this.http.patch(
+			`/v1/workspace/${workspaceId}/projects/${projectId}/custom-fields/${customFieldId}`
+		);
+		return res.data satisfies CustomField;
 	}
 	//#endregion
 }

@@ -1,6 +1,64 @@
+export type CustomFieldStatus = 'INACTIVE' | 'VISIBLE' | 'INVISIBLE';
+export type CustomFieldType =
+	| 'TXT'
+	| 'NUMBER'
+	| 'DROPDOWN_SINGLE'
+	| 'DROPDOWN_MULTIPLE'
+	| 'CHECKBOX'
+	| 'LINK';
+
 export type CustomFieldValue = {
 	customFieldId: string;
 	sourceType: string;
 	timeEntryId: string;
-	value: any;
+	value: unknown;
+};
+
+export type CustomFieldDefaultValue = {
+	projectId: string;
+	status: string;
+	value: unknown;
+};
+
+export type CustomField = {
+	allowedValues: string[];
+	description: string;
+	entityType: string;
+	id: string;
+	name: string;
+	onlyAdminCanEdit: boolean;
+	placeholder: string;
+	projectDefaultValues: CustomFieldDefaultValue[];
+	required: boolean;
+	status: string;
+	type: string;
+	workspaceDefaultValue: unknown;
+	workspaceId: string;
+};
+
+export type GetWorkspaceCustomFieldsParams = {
+	name: string;
+	status: string;
+	entityType: string[];
+};
+export type GetProjectCustomFieldsParams = {
+	status: string;
+	entityType?: string[];
+};
+
+export type SetCustomFieldRequiredRequestData = {
+	allowedValues?: string[];
+	description?: string;
+	name: string;
+	onlyAdminCanEdit?: boolean;
+	placeholder: boolean;
+	required: boolean;
+	status: CustomFieldStatus;
+	type: CustomFieldType;
+	workspaceDefaultValue: unknown;
+};
+
+export type UpdateCustomFieldRequestData = {
+	defaultValue: any;
+	status: CustomFieldStatus;
 };
