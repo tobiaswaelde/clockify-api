@@ -16,6 +16,12 @@ import {
 	UpdateClientRequestData,
 } from './types/client';
 import {
+	GetWebhooksParams,
+	Webhook,
+	CreateWebhookRequestData,
+	UpdateWebhookRequestData,
+} from './types/webhook';
+import {
 	AddUserToWorkspaceParams,
 	AddUserToWorkspaceRequest,
 	AddWorkspaceRequest,
@@ -125,7 +131,57 @@ export class Clockify {
 	}
 	//#endregion
 	//#region Webhooks
+	public static async getWebhooksAddon(workspaceId: string, addonId?: string): Promise<Webhook[]> {
+		const res = await this.http.get(`/v1/workspaces/${workspaceId}/addons/${addonId}/webhooks`);
+		return res.data satisfies Webhook[];
+	}
 
+	public static async getWebhooks(
+		workspaceId: string,
+		options?: GetWebhooksParams
+	): Promise<Webhook[]> {
+		const q = qs.stringify(options, { encodeValuesOnly: true });
+		const res = await this.http.get(`/v1/workspaces/${workspaceId}/webhooks?${q}`);
+		return res.data satisfies Webhook[];
+	}
+
+	/**
+	 * Creating a webhook generates a new token which can be used to verify that the webhook being sent was sent by Clockify, as it will always be present in the header.
+	 */
+	public static async createWebhook(
+		workspaceId: string,
+		data: CreateWebhookRequestData
+	): Promise<Webhook> {
+		const res = await this.http.post(`/v1/workspaces/${workspaceId}/webhooks`, data);
+		return res.data satisfies Webhook;
+	}
+
+	public static async deleteWebhook(workspaceId: string, webhookId: string): Promise<Webhook> {
+		const res = await this.http.delete(`/v1/workspaces/${workspaceId}/webhooks/${webhookId}`);
+		return res.data as Webhook;
+	}
+
+	public static async getWebhook(workspaceId: string, webhookId: string): Promise<Webhook> {
+		const res = await this.http.get(`/v1/workspaces/${workspaceId}/webhooks/${webhookId}`);
+		return res.data satisfies Webhook;
+	}
+
+	public static async updateWebhook(
+		workspaceId: string,
+		webhookId: string,
+		data: UpdateWebhookRequestData
+	): Promise<Webhook> {
+		const res = await this.http.put(`/v1/workspaces/${workspaceId}/webhooks/${webhookId}`, data);
+		return res.data satisfies Webhook;
+	}
+
+	public static async generateWebhookToken(
+		workspaceId: string,
+		webhookId: string
+	): Promise<Webhook> {
+		const res = await this.http.patch(`/v1/workspaces/${workspaceId}/webhooks/${webhookId}/token`);
+		return res.data satisfies Webhook;
+	}
 	//#endregion
 	//#region Approvals
 	public static async getApprovalRequests(
