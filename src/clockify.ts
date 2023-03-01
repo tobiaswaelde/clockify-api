@@ -1,5 +1,6 @@
 import axios from 'axios';
 import * as qs from 'qs';
+import { ApprovalRequestResponse, GetApprovalRequestsParams } from './types/approvals';
 import { AuthType } from './types/auth';
 import {
 	AddUserToWorkspaceParams,
@@ -62,9 +63,9 @@ export class Clockify {
 	public static async addUserToWorkspace(
 		workspaceId: string,
 		data: AddUserToWorkspaceRequest,
-		params?: AddUserToWorkspaceParams
+		options?: AddUserToWorkspaceParams
 	): Promise<Workspace> {
-		const q = qs.stringify(params, { encodeValuesOnly: true });
+		const q = qs.stringify(options, { encodeValuesOnly: true });
 		const res = await this.http.post(`/v1/workspaces/${workspaceId}/users?${q}`, data);
 		return res.data satisfies Workspace;
 	}
@@ -110,34 +111,17 @@ export class Clockify {
 		return res.data satisfies Workspace;
 	}
 	//#endregion
-	//#region Clients
-	/**
-	 * Find clients on workspace
-	 */
-	// public static async getAllClients(workspaceId: string, filter: GetClientsFilter): Promise<any[]> {
-	// 	const;
-	// 	const res = await this.http.get(``);
-	// }
-	//#endregion
-	//#region Projects
+	//#region Webhooks
 
 	//#endregion
-	//#region Tags
-
-	//#endregion
-	//#region Tasks
-
-	//#endregion
-	//#region Time entries
-
-	//#endregion
-	//#region Expenses
-
-	//#endregion
-	//#region Users
-
-	//#endregion
-	//#region Groups
-
+	//#region Approvals
+	public static async getApprovalRequests(
+		workspaceId: string,
+		options?: GetApprovalRequestsParams
+	): Promise<ApprovalRequestResponse[]> {
+		const q = qs.stringify(options, { encodeValuesOnly: true });
+		const res = await this.http.get(`/v1/workspaces/${workspaceId}/approval-requests?${q}`);
+		return res.data satisfies ApprovalRequestResponse[];
+	}
 	//#endregion
 }
