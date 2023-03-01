@@ -1,61 +1,52 @@
 import { Membership } from './membership';
-import { AutomaticLock } from './automatic-lock';
-
-export type FeatureSubscriptionType =
-	| 'FREE'
-	| 'TRIAL'
-	| 'BASIC_2021'
-	| 'BASIC_YEAR_2021'
-	| 'STANDARD_2021'
-	| 'STANDARD_YEAR_2021'
-	| 'PRO_2021'
-	| 'PRO_YEAR_2021'
-	| 'ENTERPRISE_2021'
-	| 'ENTERPRISE_YEAR_2021';
-
-export type Round = {
-	minutes: string;
-	round: string;
-};
-
-export type WorkspaceSettings = {
-	timeRoundingInReports: boolean;
-	onlyAdminsSeeBillableRates: boolean;
-	onlyAdminsCreateProject: boolean;
-	onlyAdminsSeeDashboard: boolean;
-	defaultBillableProjects: boolean;
-	lockTimeEntries: null;
-	round: Round;
-	projectFavorites: boolean;
-	canSeeTimeSheet: boolean;
-	canSeeTracker: boolean;
-	projectPickerSpecialFilter: boolean;
-	forceProjects: boolean;
-	forceTasks: boolean;
-	forceTags: boolean;
-	forceDescription: boolean;
-	onlyAdminsSeeAllTimeEntries: boolean;
-	onlyAdminsSeePublicProjectsEntries: boolean;
-	trackTimeDownToSecond: boolean;
-	projectGroupingLabel: 'client';
-	adminOnlyPages: [];
-	automaticLock: AutomaticLock;
-	onlyAdminsCreateTag: boolean;
-	onlyAdminsCreateTask: boolean;
-	timeTrackingMode: 'DEFAULT';
-	isProjectPublicByDefault: boolean;
-};
+import { WorkspaceSettings } from './workspace-settings';
+import { FeatureSubscriptionType } from './feature-subscription-type';
+import { CostRate, CostRateRequest } from './cost-rate';
+import { HourlyRate, HourlyRateRequest } from './hourly-rate';
 
 export type Workspace = {
-	id: string;
-	name: string;
-	hourlyRate: {
-		amount: number;
-		currency: string;
-	};
-	costRate: any;
-	memberships: Membership[];
-	workspaceSettings: WorkspaceSettings;
-	imageUrl: string;
+	costRate: CostRate;
 	featureSubscriptionType: FeatureSubscriptionType;
+	hourlyRate: HourlyRate;
+	id: string;
+	imageUrl: string;
+	memberships: Membership[];
+	name: string;
+	workspaceSettings: WorkspaceSettings;
 };
+
+export type AddWorkspaceRequest = {
+	name: string;
+};
+
+export type UpdateWorkspaceCostRateRequest = {
+	/** `>= 0` */
+	amount: number;
+	currency: string;
+	since: string;
+};
+
+export type UpdateWorkspaceBillingRateRequest = {
+	/** `>= 0` */
+	amount: number;
+	currency: string;
+	since: string;
+};
+
+export type AddUserToWorkspaceRequest = {
+	email: string;
+};
+export type AddUserToWorkspaceParams = {
+	/**
+	 * @default true
+	 */
+	sendEmail?: boolean;
+};
+
+export type UpdateUserStatusRequest = {
+	membershipStatus: 'ACTIVE' | 'INACTIVE';
+	status?: string;
+};
+
+export type UpdateUserCostRateRequest = CostRateRequest;
+export type UpdateUserHourlyRateRequest = HourlyRateRequest;

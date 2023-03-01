@@ -4,6 +4,7 @@ export type HourlyRate = {
 };
 
 export type HourlyRateRequest = {
+	/** `>= 0` */
 	amount: number;
-	currency: string;
+	since?: string;
 };

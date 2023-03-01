@@ -1,8 +1,19 @@
 import axios from 'axios';
 import * as qs from 'qs';
 import { AuthType } from './types/auth';
+import {
+	AddUserToWorkspaceParams,
+	AddUserToWorkspaceRequest,
+	AddWorkspaceRequest,
+	UpdateUserCostRateRequest,
+	UpdateUserHourlyRateRequest,
+	UpdateUserStatusRequest,
+	UpdateWorkspaceBillingRateRequest,
+	UpdateWorkspaceCostRateRequest,
+	Workspace,
+} from './types/workspace';
 
-const BASE_URL = 'https://api.clockify.me/api/v1';
+const BASE_URL = 'https://api.clockify.me/api';
 
 export class Clockify {
 	private static http = axios.create({
@@ -22,7 +33,82 @@ export class Clockify {
 
 	//#endregion
 	//#region Workspaces
+	public static async getAllMyWorkspaces(): Promise<Workspace[]> {
+		const res = await this.http.get(`/v1/workspaces`);
+		return res.data satisfies Workspace[];
+	}
 
+	public static async addWorkspace(workspace: AddWorkspaceRequest): Promise<Workspace> {
+		const res = await this.http.post(`/v1/workspaces`, workspace);
+		return res.data satisfies Workspace;
+	}
+
+	public static async updateWorkspaceCostRate(
+		workspaceId: string,
+		data: UpdateWorkspaceCostRateRequest
+	): Promise<Workspace> {
+		const res = await this.http.put(`/v1/workspaces/${workspaceId}/cost-rate`, data);
+		return res.data satisfies Workspace;
+	}
+
+	public static async updateWorkspaceBillingRate(
+		workspaceId: string,
+		data: UpdateWorkspaceBillingRateRequest
+	): Promise<Workspace> {
+		const res = await this.http.put(`/v1/workspaces/${workspaceId}/hourly-rate`, data);
+		return res.data satisfies Workspace;
+	}
+
+	public static async addUserToWorkspace(
+		workspaceId: string,
+		data: AddUserToWorkspaceRequest,
+		params?: AddUserToWorkspaceParams
+	): Promise<Workspace> {
+		const q = qs.stringify(params, { encodeValuesOnly: true });
+		const res = await this.http.post(`/v1/workspaces/${workspaceId}/users?${q}`, data);
+		return res.data satisfies Workspace;
+	}
+
+	public static async removeUserFromWorkspace(
+		workspaceId: string,
+		userId: string
+	): Promise<Workspace> {
+		const res = await this.http.delete(`/v1/workspaces/${workspaceId}/users/${userId}`);
+		return res.data satisfies Workspace;
+	}
+
+	public static async updateUserStatus(
+		workspaceId: string,
+		userId: string,
+		data: UpdateUserStatusRequest
+	): Promise<Workspace> {
+		const res = await this.http.put(`/v1/workspaces/${workspaceId}/users/${userId}`, data);
+		return res.data satisfies Workspace;
+	}
+
+	public static async updateUserCostRate(
+		workspaceId: string,
+		userId: string,
+		data: UpdateUserCostRateRequest
+	): Promise<Workspace> {
+		const res = await this.http.put(
+			`/v1/workspaces/${workspaceId}/users/${userId}/cost-rate`,
+			data
+		);
+		return res.data satisfies Workspace;
+	}
+
+	public static async updateUserHourlyRate(
+		workspaceId: string,
+		userId: string,
+		data: UpdateUserHourlyRateRequest
+	): Promise<Workspace> {
+		const res = await this.http.put(
+			`/v1/workspaces/${workspaceId}/users/${userId}/cost-rate`,
+			data
+		);
+		return res.data satisfies Workspace;
+	}
 	//#endregion
 	//#region Clients
 	/**
