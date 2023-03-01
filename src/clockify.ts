@@ -1,6 +1,6 @@
 import axios from 'axios';
 import * as qs from 'qs';
-import { GetClientsFilter } from './types/clients';
+import { AuthType } from './types/auth';
 
 const BASE_URL = 'https://api.clockify.me/api/v1';
 
@@ -11,12 +11,19 @@ export class Clockify {
 
 	/**
 	 * Authenticate using API key
-	 * @param {string} apiKey The API key, `undefined` to remove authentication
+	 * @param {string} key The API key or Addon key, `undefined` to remove authentication
+	 * @param {AuthType} authType The type of the authentication
 	 */
-	public static authenticate(apiKey: string | undefined) {
-		this.http.defaults.headers.common['X-Api-Key'] = apiKey;
+	public static authenticate(apiKey: string | undefined, authType: AuthType = AuthType.ApiKey) {
+		this.http.defaults.headers.common[authType] = apiKey;
 	}
 
+	//#region User
+
+	//#endregion
+	//#region Workspaces
+
+	//#endregion
 	//#region Clients
 	/**
 	 * Find clients on workspace
@@ -45,9 +52,6 @@ export class Clockify {
 
 	//#endregion
 	//#region Groups
-
-	//#endregion
-	//#region Workspaces
 
 	//#endregion
 }
