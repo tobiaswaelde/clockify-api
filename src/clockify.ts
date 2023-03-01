@@ -21,6 +21,7 @@ import {
 	GetWorkspaceCustomFieldsParams,
 	SetCustomFieldRequiredRequestData,
 } from './types/custom-fields';
+import { AddTaskParams, AddTaskRequestBody, GetTasksParams, Task } from './types/task';
 import {
 	GetWebhooksParams,
 	Webhook,
@@ -55,9 +56,7 @@ export class Clockify {
 		this.http.defaults.headers.common[authType] = apiKey;
 	}
 
-	//#region User
-
-	//#endregion
+	// User
 	//#region Workspaces
 	public static async getAllMyWorkspaces(): Promise<Workspace[]> {
 		const res = await this.http.get(`/v1/workspaces`);
@@ -322,5 +321,43 @@ export class Clockify {
 		);
 		return res.data satisfies CustomField;
 	}
+	//#endregion
+	// Project
+	//#region Tasks
+	public static async getTasks(
+		workspaceId: string,
+		projectId: string,
+		options?: GetTasksParams
+	): Promise<Task[]> {
+		const q = qs.stringify(options, { encodeValuesOnly: true });
+		const res = await this.http.get(
+			`/v1/workspaces/${workspaceId}/projects/${projectId}/tasks?${q}`
+		);
+		return res.data satisfies Task[];
+	}
+
+	public static async addTask(
+		workspaceId: string,
+		projectId: string,
+		data: AddTaskRequestBody,
+		options?: AddTaskParams
+	): Promise<Task> {
+		const q = qs.stringify(options, { encodeValuesOnly: true });
+		const res = await this.http.post(
+			`/v1/workspaces/${workspaceId}/projects/${projectId}/tasks?${q}`,
+			data
+		);
+		return res.data satisfies Task;
+	}
+
+	public static async updateTaskCostRate(workspaceId: string, projectId: string, taskId: string) {}
+	public static async updateTaskBillableRate(
+		workspaceId: string,
+		projectId: string,
+		taskId: string
+	) {}
+	public static async deleteTask(workspaceId: string, projectId: string, taskId: string) {}
+	public static async getTask(workspaceId: string, projectId: string, taskId: string) {}
+	public static async updateTask(workspaceId: string, projectId: string, taskId: string) {}
 	//#endregion
 }
