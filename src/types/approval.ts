@@ -73,3 +73,9 @@ export type GetApprovalRequestsParams = {
 	 */
 	'page-size'?: number;
 };
+
+export type SubmitApprovalRequestData = {
+	period: string;
+	weekTime: string;
+	weeksAgo: number;
+};

@@ -1,6 +1,11 @@
 import axios from 'axios';
 import * as qs from 'qs';
-import { ApprovalRequestResponse, GetApprovalRequestsParams } from './types/approvals';
+import {
+	ApprovalRequest,
+	ApprovalRequestResponse,
+	GetApprovalRequestsParams,
+	SubmitApprovalRequestData,
+} from './types/approval';
 import { AuthType } from './types/auth';
 import {
 	AddUserToWorkspaceParams,
@@ -122,6 +127,14 @@ export class Clockify {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
 		const res = await this.http.get(`/v1/workspaces/${workspaceId}/approval-requests?${q}`);
 		return res.data satisfies ApprovalRequestResponse[];
+	}
+
+	public static async submitApprovalRequest(
+		workspaceId: string,
+		data: SubmitApprovalRequestData
+	): Promise<ApprovalRequest> {
+		const res = await this.http.post(`/v1/workspaces/${workspaceId}/approval-requests`, data);
+		return res.data satisfies ApprovalRequest;
 	}
 	//#endregion
 }
