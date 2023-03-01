@@ -105,7 +105,7 @@ export class Clockify {
 		data: UpdateUserHourlyRateRequest
 	): Promise<Workspace> {
 		const res = await this.http.put(
-			`/v1/workspaces/${workspaceId}/users/${userId}/cost-rate`,
+			`/v1/workspaces/${workspaceId}/users/${userId}/hourly-rate`,
 			data
 		);
 		return res.data satisfies Workspace;

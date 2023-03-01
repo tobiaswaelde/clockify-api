@@ -11,11 +11,3 @@ export type Membership = {
 	targetId: string;
 	userId: string;
 };
-// export type MembershipRequest = {
-// 	userId: string;
-// 	hourlyRate: HourlyRateRequest;
-// 	costRate: any;
-// 	targetId: string;
-// 	membershipType: string;
-// 	membershipStatus: string;
-// };
