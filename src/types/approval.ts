@@ -79,3 +79,8 @@ export type SubmitApprovalRequestData = {
 	weekTime: string;
 	weeksAgo: number;
 };
+
+export type UpdateApprovalRequestData = {
+	note: string;
+	state: string;
+};

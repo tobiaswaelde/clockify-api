@@ -5,8 +5,16 @@ import {
 	ApprovalRequestResponse,
 	GetApprovalRequestsParams,
 	SubmitApprovalRequestData,
+	UpdateApprovalRequestData,
 } from './types/approval';
 import { AuthType } from './types/auth';
+import {
+	AddClientRequestData,
+	Client,
+	GetClientsParams,
+	UpdateClientParams,
+	UpdateClientRequestData,
+} from './types/client';
 import {
 	AddUserToWorkspaceParams,
 	AddUserToWorkspaceRequest,
@@ -135,6 +143,66 @@ export class Clockify {
 	): Promise<ApprovalRequest> {
 		const res = await this.http.post(`/v1/workspaces/${workspaceId}/approval-requests`, data);
 		return res.data satisfies ApprovalRequest;
+	}
+
+	public static async submitApprovalRequestForUser(
+		workspaceId: string,
+		userId: string,
+		data: SubmitApprovalRequestData
+	): Promise<ApprovalRequest> {
+		const res = await this.http.post(
+			`/v1/workspaces/${workspaceId}/approval-requests/users/${userId}`,
+			data
+		);
+		return res.data satisfies ApprovalRequest;
+	}
+
+	public static async updateApprovalRequest(
+		workspaceId: string,
+		approvalRequestId: string,
+		data: UpdateApprovalRequestData
+	): Promise<ApprovalRequest> {
+		const res = await this.http.patch(
+			`/v1/workspaces/${workspaceId}/approval-requests/${approvalRequestId}`,
+			data
+		);
+		return res.data as ApprovalRequest;
+	}
+	//#endregion
+	//#region Clients
+	public static async findClientsOnWorkspace(
+		workspaceId: string,
+		options?: GetClientsParams
+	): Promise<Client[]> {
+		const q = qs.stringify(options, { encodeValuesOnly: true });
+		const res = await this.http.get(`/v1/workspaces/${workspaceId}/clients?${q}`);
+		return res.data satisfies Client[];
+	}
+
+	public static async addClient(workspaceId: string, data: AddClientRequestData): Promise<Client> {
+		const res = await this.http.post(`/v1/workspaces/${workspaceId}/clients`, data);
+		return res.data satisfies Client;
+	}
+
+	public static async deleteClient(workspaceId: string, clientId: string): Promise<Client> {
+		const res = await this.http.delete(`/v1/workspaces/${workspaceId}/clients/${clientId}`);
+		return res.data satisfies Client;
+	}
+
+	public static async getClient(workspaceId: string, clientId: string): Promise<Client> {
+		const res = await this.http.get(`/v1/workspaces/${workspaceId}/clients/${clientId}`);
+		return res.data satisfies Client;
+	}
+
+	public static async updateClient(
+		workspaceId: string,
+		clientId: string,
+		data: UpdateClientRequestData,
+		options?: UpdateClientParams
+	): Promise<Client> {
+		const q = qs.stringify(options, { encodeValuesOnly: true });
+		const res = await this.http.put(`/v1/workspaces/${workspaceId}/clients/${clientId}?${q}`, data);
+		return res.data satisfies Client;
 	}
 	//#endregion
 }
