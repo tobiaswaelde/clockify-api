@@ -73,3 +73,33 @@ export type AddTaskRequestBody = {
 	statusEnum?: 'ACTIVE' | 'DONE' | 'ALL';
 	userGroupIds: string[];
 };
+
+export type UpdateTaskCostRateRequestBody = {
+	/** `>= 0` */
+	amount?: number;
+	since?: string;
+};
+
+export type UpdateTaskBillableRateRequestBody = {
+	/** `>= 0` */
+	amount: number;
+	since?: string;
+};
+
+export type UpdateTaskParams = {
+	/**
+	 * @default true
+	 */
+	'contains-assignee'?: boolean;
+	'membership-status'?: string;
+};
+export type UpdateTaskRequestBody = {
+	assigneeId?: string;
+	assigneeIds?: string[];
+	billable?: boolean;
+	budgetEstimate?: number;
+	estimate?: Estimate;
+	name: string;
+	status?: string;
+	userGroupIds: string[];
+};

@@ -21,7 +21,15 @@ import {
 	GetWorkspaceCustomFieldsParams,
 	SetCustomFieldRequiredRequestData,
 } from './types/custom-fields';
-import { AddTaskParams, AddTaskRequestBody, GetTasksParams, Task } from './types/task';
+import {
+	AddTaskParams,
+	AddTaskRequestBody,
+	GetTasksParams,
+	Task,
+	UpdateTaskBillableRateRequestBody,
+	UpdateTaskCostRateRequestBody,
+	UpdateTaskRequestBody,
+} from './types/task';
 import {
 	GetWebhooksParams,
 	Webhook,
@@ -350,14 +358,65 @@ export class Clockify {
 		return res.data satisfies Task;
 	}
 
-	public static async updateTaskCostRate(workspaceId: string, projectId: string, taskId: string) {}
+	public static async updateTaskCostRate(
+		workspaceId: string,
+		projectId: string,
+		taskId: string,
+		data: UpdateTaskCostRateRequestBody
+	): Promise<Task> {
+		const res = await this.http.put(
+			`/v1/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}/cost-rate`,
+			data
+		);
+		return res.data satisfies Task;
+	}
+
 	public static async updateTaskBillableRate(
 		workspaceId: string,
 		projectId: string,
+		taskId: string,
+		data: UpdateTaskBillableRateRequestBody
+	): Promise<Task> {
+		const res = await this.http.put(
+			`/v1/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}/hourly-rate`,
+			data
+		);
+		return res.data satisfies Task;
+	}
+
+	public static async deleteTask(
+		workspaceId: string,
+		projectId: string,
 		taskId: string
-	) {}
-	public static async deleteTask(workspaceId: string, projectId: string, taskId: string) {}
-	public static async getTask(workspaceId: string, projectId: string, taskId: string) {}
-	public static async updateTask(workspaceId: string, projectId: string, taskId: string) {}
+	): Promise<Task> {
+		const res = await this.http.delete(
+			`/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}`
+		);
+		return res.data satisfies Task;
+	}
+
+	public static async getTask(
+		workspaceId: string,
+		projectId: string,
+		taskId: string
+	): Promise<Task> {
+		const res = await this.http.get(
+			`/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}`
+		);
+		return res.data satisfies Task;
+	}
+
+	public static async updateTask(
+		workspaceId: string,
+		projectId: string,
+		taskId: string,
+		data: UpdateTaskRequestBody
+	): Promise<Task> {
+		const res = await this.http.put(
+			`/v1/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}`,
+			data
+		);
+		return res.data satisfies Task;
+	}
 	//#endregion
 }
