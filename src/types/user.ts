@@ -1,4 +1,4 @@
-import { Membership } from './membership';
+import { Membership, MembershipStatus } from './membership';
 import { Role } from './role';
 import { SortOrder } from './sort-order';
 import { UserCustomFieldValue } from './user-custom-field-value';
@@ -140,7 +140,7 @@ export type GetUsersParams = {
 	 *
 	 * @default 'NONE'
 	 */
-	memberships?: 'WORKSPACE' | 'PROJECT' | 'USERGROUP' | 'NONE' | 'ALL';
+	memberships?: MembershipStatus;
 
 	/**
 	 * If you pass along includeRoles=true, you'll get each user's detailed manager role (including projects and members for whome they're managers)
