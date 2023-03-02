@@ -7,6 +7,13 @@ import {
 	SubmitApprovalRequestBody,
 	UpdateApprovalRequestBody,
 } from './types/approval';
+import {
+	Assignment,
+	GetAssignmentsFilter,
+	GetProjectScheduledAssignmentsFilter,
+	GetScheduledAssignmentsFilter,
+	ScheduledAssignment,
+} from './types/assignment';
 import { AuthType } from './types/auth';
 import {
 	AddClientRequestBody,
@@ -660,7 +667,50 @@ export class Clockify {
 		return res.data satisfies Task;
 	}
 	//#endregion
-	//TODO Scheduling
+	//#region Scheduling
+	public static async getAssignments(
+		workspaceId: string,
+		filter?: GetAssignmentsFilter
+	): Promise<Assignment[]> {
+		const q = qs.stringify(filter, { encodeValuesOnly: true });
+		const res = await this.http.get(
+			`/v1/workspaces/${workspaceId}/scheduling/assignments/all?${q}`
+		);
+		return res.data satisfies Assignment[];
+	}
+
+	public static async getScheduledAssignments(
+		workspaceId: string,
+		filter?: GetScheduledAssignmentsFilter
+	): Promise<ScheduledAssignment[]> {
+		const q = qs.stringify(filter, { encodeValuesOnly: true });
+		const res = await this.http.get(
+			`/v1/workspaces/${workspaceId}/scheduling/assignments/projects/totals?${q}`
+		);
+		return res.data satisfies ScheduledAssignment[];
+	}
+
+	public static async getProjectScheduledAssignments(
+		workspaceId: string,
+		projectId: string,
+		filter?: GetProjectScheduledAssignmentsFilter
+	): Promise<ScheduledAssignment[]> {
+		const q = qs.stringify(filter, { encodeValuesOnly: true });
+		const res = await this.http.get(
+			`/v1/workspaces/${workspaceId}/scheduling/assignments/projects/totals/${projectId}?${q}`
+		);
+		return res.data satisfies ScheduledAssignment[];
+	}
+
+	public static async publishAssignment() {}
+	public static async createRecurringAssignment() {}
+	public static async deleteRecurringAssignment() {}
+	public static async updateRecurringAssignemnt() {}
+	public static async changeRecurringPeriod() {}
+	public static async getUsersTotalCapacity() {}
+	public static async getUserTotalCapacity() {}
+	public static async copyScheduledAssignment() {}
+	//#endregion
 	//#region Tags
 	public static async getTags(workspaceId: string, options?: GetTagsFilter): Promise<Tag[]> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
