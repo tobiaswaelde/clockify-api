@@ -21,6 +21,7 @@ import {
 	GetWorkspaceCustomFieldsParams,
 	SetCustomFieldRequiredRequestData,
 } from './types/custom-fields';
+import { AddGroupRequestBody, GetGroupParams, Group, UpdateGroupRequestBody } from './types/group';
 import { AddTagRequestBody, GetTagsParams, Tag, UpdateTagRequestBody } from './types/tag';
 import {
 	AddTaskParams,
@@ -392,7 +393,7 @@ export class Clockify {
 		taskId: string
 	): Promise<Task> {
 		const res = await this.http.delete(
-			`/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}`
+			`/v1/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}`
 		);
 		return res.data satisfies Task;
 	}
@@ -403,7 +404,7 @@ export class Clockify {
 		taskId: string
 	): Promise<Task> {
 		const res = await this.http.get(
-			`/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}`
+			`/v1/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}`
 		);
 		return res.data satisfies Task;
 	}
@@ -427,22 +428,22 @@ export class Clockify {
 	//#region Tags
 	public static async getTags(workspaceId: string, options?: GetTagsParams): Promise<Tag[]> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
-		const res = await this.http.get(`/workspaces/${workspaceId}/tags`);
+		const res = await this.http.get(`/v1/workspaces/${workspaceId}/tags`);
 		return res.data satisfies Tag[];
 	}
 
 	public static async addTag(workspaceId: string, data: AddTagRequestBody): Promise<Tag> {
-		const res = await this.http.post(`/workspaces/${workspaceId}/tags`, data);
+		const res = await this.http.post(`/v1/workspaces/${workspaceId}/tags`, data);
 		return res.data satisfies Tag;
 	}
 
 	public static async deleteTag(workspaceId: string, tagId: string): Promise<Tag> {
-		const res = await this.http.post(`/workspaces/${workspaceId}/tags/${tagId}`);
+		const res = await this.http.post(`/v1/workspaces/${workspaceId}/tags/${tagId}`);
 		return res.data satisfies Tag;
 	}
 
 	public static async getTag(workspaceId: string, tagId: string): Promise<Tag> {
-		const res = await this.http.get(`/workspaces/${workspaceId}/tags/${tagId}`);
+		const res = await this.http.get(`/v1/workspaces/${workspaceId}/tags/${tagId}`);
 		return res.data satisfies Tag;
 	}
 
@@ -451,12 +452,57 @@ export class Clockify {
 		tagId: string,
 		data: UpdateTagRequestBody
 	): Promise<Tag> {
-		const res = await this.http.put(`/workspaces/${workspaceId}/tags/${tagId}`, data);
+		const res = await this.http.put(`/v1/workspaces/${workspaceId}/tags/${tagId}`, data);
 		return res.data satisfies Tag;
 	}
 	//#endregion
 	// Time Entries
 	//#region Groups
+	public static async getGroups(workspaceId: string, options?: GetGroupParams): Promise<Group[]> {
+		const q = qs.stringify(options, { encodeValuesOnly: true });
+		const res = await this.http.get(`/v1/workspaces/${workspaceId}/user-groups?${q}`);
+		return res.data satisfies Group[];
+	}
 
+	public static async addGroup(workspaceId: string, data: AddGroupRequestBody): Promise<Group> {
+		const res = await this.http.post(`/v1/workspaces/${workspaceId}/user-groups`, data);
+		return res.data satisfies Group;
+	}
+
+	public static async deleteGroup(workspaceId: string, groupId: string): Promise<Group> {
+		const res = await this.http.delete(`/v1/workspaces/${workspaceId}/user-groups/${groupId}`);
+		return res.data satisfies Group;
+	}
+
+	public static async updateGroup(
+		workspaceId: string,
+		groupId: string,
+		data: UpdateGroupRequestBody
+	): Promise<Group> {
+		const res = await this.http.put(`/v1/workspaces/${workspaceId}/user-groups/${groupId}`, data);
+		return res.data satisfies Group;
+	}
+
+	public static async addUserToGroup(
+		workspaceId: string,
+		groupId: string,
+		userId: string
+	): Promise<Group> {
+		const res = await this.http.post(`/v1/workspaces/${workspaceId}/user-groups/${groupId}/users`, {
+			userId,
+		});
+		return res.data satisfies Group;
+	}
+
+	public static async removeUserFromGroup(
+		workspaceId: string,
+		groupId: string,
+		userId: string
+	): Promise<Group> {
+		const res = await this.http.delete(
+			`/v1/workspaces/${workspaceId}/user-groups/${groupId}/users/${userId}`
+		);
+		return res.data satisfies Group;
+	}
 	//#endregion
 }
