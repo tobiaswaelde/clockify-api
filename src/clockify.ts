@@ -22,6 +22,7 @@ import {
 	SetCustomFieldRequiredRequestData,
 } from './types/custom-fields';
 import { AddGroupRequestBody, GetGroupParams, Group, UpdateGroupRequestBody } from './types/group';
+import { MemberProfile, UpdateMemberProfileRequestBody } from './types/member-profile';
 import { AddTagRequestBody, GetTagsParams, Tag, UpdateTagRequestBody } from './types/tag';
 import {
 	AddTaskParams,
@@ -33,6 +34,21 @@ import {
 	UpdateTaskParams,
 	UpdateTaskRequestBody,
 } from './types/task';
+import {
+	AddUserPhotoResponse,
+	GetCurrentUserInfoParams,
+	UserInfo,
+	UpdateUserEmailRequestBody,
+	UpdateUserEmailParams,
+	GetUsersParams,
+	FilterWorkspaceUsersRequestBody,
+	UpdateUserCustomFieldRequestBody,
+	GetUserTeamManagerParams,
+	RemoveUserManagerRequestBody,
+	GiveUserManagerRoleRequestBody,
+	GiveUserManagerRoleResponse,
+} from './types/user';
+import { UserCustomFieldValue } from './types/user-custom-field-value';
 import {
 	GetWebhooksParams,
 	Webhook,
@@ -67,7 +83,111 @@ export class Clockify {
 		this.http.defaults.headers.common[authType] = apiKey;
 	}
 
-	// User
+	//#region User
+	public static async addUserPhoto(image: string | Blob): Promise<AddUserPhotoResponse> {
+		const data = new FormData();
+		data.append('file', image);
+
+		const res = await this.http.post(`/v1/file/image`, data);
+		return res.data satisfies AddUserPhotoResponse;
+	}
+
+	public static async getCurrentUserInfo(options?: GetCurrentUserInfoParams): Promise<UserInfo> {
+		const q = qs.stringify(options, { encodeValuesOnly: true });
+		const res = await this.http.get(`/v1/user?${q}`);
+		return res.data satisfies UserInfo;
+	}
+
+	public static async getMembersProfile(
+		workspaceId: string,
+		userId: string
+	): Promise<MemberProfile> {
+		const res = await this.http.get(`/v1/workspaces/${workspaceId}/member-profile/${userId}`);
+		return res.data satisfies MemberProfile;
+	}
+
+	public static async updateMembersProfile(
+		workspaceId: string,
+		userId: string,
+		data: UpdateMemberProfileRequestBody
+	): Promise<MemberProfile> {
+		const res = await this.http.patch(
+			`/v1/workspaces/${workspaceId}/member-profile/${userId}`,
+			data
+		);
+		return res.data satisfies MemberProfile;
+	}
+
+	public static async updateUserEmail(
+		workspaceId: string,
+		userId: string,
+		data: UpdateUserEmailRequestBody,
+		options?: UpdateUserEmailParams
+	): Promise<void> {
+		const q = qs.stringify(options, { encodeValuesOnly: true });
+		const res = await this.http.put(
+			`/v1/workspaces/${workspaceId}/member-profile/${userId}/email?${q}`,
+			data
+		);
+		return res.data;
+	}
+
+	public static async getUsers(workspaceId: string, options?: GetUsersParams): Promise<UserInfo[]> {
+		const q = qs.stringify(options, { encodeValuesOnly: true });
+		const res = await this.http.get(`/v1/workspaces/${workspaceId}/users?${q}`);
+		return res.data satisfies UserInfo[];
+	}
+
+	public static async filterWorkspaceUsers(
+		workspaceId: string,
+		data: FilterWorkspaceUsersRequestBody
+	): Promise<UserInfo> {
+		const res = await this.http.post(`/v1/workspaces/${workspaceId}/users/info`, data);
+		return res.data satisfies UserInfo;
+	}
+
+	public static async updateUserCustomField(
+		workspaceId: string,
+		userId: string,
+		customFieldId: string,
+		data: UpdateUserCustomFieldRequestBody
+	): Promise<UserCustomFieldValue> {
+		const res = await this.http.put(
+			`/v1/workspaces/${workspaceId}/users/${userId}/custom-field/${customFieldId}/value`,
+			data
+		);
+		return res.data satisfies UserCustomFieldValue;
+	}
+
+	public static async getUserTeamManager(
+		workspaceId: string,
+		userId: string,
+		options?: GetUserTeamManagerParams
+	): Promise<UserInfo> {
+		const q = qs.stringify(options, { encodeValuesOnly: true });
+		const res = await this.http.get(`/v1/workspaces/${workspaceId}/users/${userId}/managers?${q}`);
+		return res.data satisfies UserInfo;
+	}
+
+	public static async removeUserManagerRole(
+		workspaceId: string,
+		userId: string,
+		data: RemoveUserManagerRequestBody
+	): Promise<void> {
+		await this.http.delete(`/v1/workspaces/${workspaceId}/users/${userId}/roles`, {
+			data,
+		});
+	}
+
+	public static async giveUserManagerRole(
+		workspaceId: string,
+		userId: string,
+		data: GiveUserManagerRoleRequestBody
+	): Promise<GiveUserManagerRoleResponse> {
+		const res = await this.http.post(`/v1/workspaces/${workspaceId}/users/${userId}/roles`, data);
+		return res.data satisfies GiveUserManagerRoleResponse;
+	}
+	//#endregion
 	//#region Workspaces
 	public static async getAllMyWorkspaces(): Promise<Workspace[]> {
 		const res = await this.http.get(`/v1/workspaces`);
