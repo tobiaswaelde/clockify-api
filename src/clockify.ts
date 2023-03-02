@@ -21,6 +21,7 @@ import {
 	GetWorkspaceCustomFieldsParams,
 	SetCustomFieldRequiredRequestData,
 } from './types/custom-fields';
+import { AddTagRequestBody, GetTagsParams, Tag, UpdateTagRequestBody } from './types/tag';
 import {
 	AddTaskParams,
 	AddTaskRequestBody,
@@ -28,6 +29,7 @@ import {
 	Task,
 	UpdateTaskBillableRateRequestBody,
 	UpdateTaskCostRateRequestBody,
+	UpdateTaskParams,
 	UpdateTaskRequestBody,
 } from './types/task';
 import {
@@ -410,13 +412,51 @@ export class Clockify {
 		workspaceId: string,
 		projectId: string,
 		taskId: string,
-		data: UpdateTaskRequestBody
+		data: UpdateTaskRequestBody,
+		options?: UpdateTaskParams
 	): Promise<Task> {
+		const q = qs.stringify(options, { encodeValuesOnly: true });
 		const res = await this.http.put(
-			`/v1/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}`,
+			`/v1/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}?${q}`,
 			data
 		);
 		return res.data satisfies Task;
 	}
+	//#endregion
+	// Scheduling
+	//#region Tags
+	public static async getTags(workspaceId: string, options?: GetTagsParams): Promise<Tag[]> {
+		const q = qs.stringify(options, { encodeValuesOnly: true });
+		const res = await this.http.get(`/workspaces/${workspaceId}/tags`);
+		return res.data satisfies Tag[];
+	}
+
+	public static async addTag(workspaceId: string, data: AddTagRequestBody): Promise<Tag> {
+		const res = await this.http.post(`/workspaces/${workspaceId}/tags`, data);
+		return res.data satisfies Tag;
+	}
+
+	public static async deleteTag(workspaceId: string, tagId: string): Promise<Tag> {
+		const res = await this.http.post(`/workspaces/${workspaceId}/tags/${tagId}`);
+		return res.data satisfies Tag;
+	}
+
+	public static async getTag(workspaceId: string, tagId: string): Promise<Tag> {
+		const res = await this.http.get(`/workspaces/${workspaceId}/tags/${tagId}`);
+		return res.data satisfies Tag;
+	}
+
+	public static async updateTag(
+		workspaceId: string,
+		tagId: string,
+		data: UpdateTagRequestBody
+	): Promise<Tag> {
+		const res = await this.http.put(`/workspaces/${workspaceId}/tags/${tagId}`, data);
+		return res.data satisfies Tag;
+	}
+	//#endregion
+	// Time Entries
+	//#region Groups
+
 	//#endregion
 }
