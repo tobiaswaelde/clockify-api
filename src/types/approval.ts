@@ -44,7 +44,7 @@ export type ApprovalRequestStatus = {
 	updatedByUserId: string;
 };
 
-export type GetApprovalRequestsParams = {
+export type GetApprovalRequestsFilter = {
 	/**
 	 * @default 'PENDING'
 	 */
@@ -74,13 +74,13 @@ export type GetApprovalRequestsParams = {
 	'page-size'?: number;
 };
 
-export type SubmitApprovalRequestData = {
+export type SubmitApprovalRequestBody = {
 	period: string;
 	weekTime: string;
 	weeksAgo: number;
 };
 
-export type UpdateApprovalRequestData = {
+export type UpdateApprovalRequestBody = {
 	note: string;
 	state: string;
 };

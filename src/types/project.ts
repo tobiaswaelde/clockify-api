@@ -36,7 +36,7 @@ export type ProjectInfo = Project & {
 	timeEstimate: TimeEstimate;
 };
 
-export type GetProjectsParams = {
+export type GetProjectsFilter = {
 	name?: string;
 	'strict-name-search'?: boolean;
 	archived?: boolean;
@@ -105,7 +105,7 @@ export type AddProjectRequestBody = {
 	tasks: TaskRequest[];
 };
 
-export type GetProjectParams = {
+export type GetProjectFilter = {
 	/**
 	 * @default false
 	 */

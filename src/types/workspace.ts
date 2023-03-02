@@ -36,7 +36,7 @@ export type UpdateWorkspaceBillingRateRequest = {
 export type AddUserToWorkspaceRequest = {
 	email: string;
 };
-export type AddUserToWorkspaceParams = {
+export type AddUserToWorkspaceFilter = {
 	/**
 	 * @default true
 	 */

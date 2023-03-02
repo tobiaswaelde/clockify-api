@@ -68,11 +68,11 @@ export type UserInfo = {
 	status: UserStatus;
 };
 
-export type GetCurrentUserInfoParams = {
+export type GetCurrentUserInfoFilter = {
 	'include-memberships'?: boolean;
 };
 
-export type UpdateUserEmailParams = {
+export type UpdateUserEmailFilter = {
 	'Sub-Domain-Name'?: string;
 };
 export type UpdateUserEmailRequestBody = {
@@ -80,7 +80,7 @@ export type UpdateUserEmailRequestBody = {
 	passwordConfirm?: string;
 };
 
-export type GetUsersParams = {
+export type GetUsersFilter = {
 	/**
 	 * If provided, you'll get a filtered list of users that contain the provided string in their email address.
 	 */

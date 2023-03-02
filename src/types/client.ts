@@ -10,7 +10,7 @@ export type Client = {
 	workspaceId: string;
 };
 
-export type GetClientsParams = {
+export type GetClientsFilter = {
 	name?: string;
 
 	/**
@@ -36,7 +36,7 @@ export type GetClientsParams = {
 	archived?: boolean;
 };
 
-export type AddClientRequestData = {
+export type AddClientRequestBody = {
 	/** [0..3000] characters */
 	address?: string;
 	email?: string;
@@ -46,11 +46,11 @@ export type AddClientRequestData = {
 	note?: string;
 };
 
-export type UpdateClientParams = {
+export type UpdateClientFilter = {
 	'archive-projects'?: boolean;
 };
 
-export type UpdateClientRequestData = {
+export type UpdateClientRequestBody = {
 	/** [0..3000] characters */
 	address?: string;
 	archived?: string;

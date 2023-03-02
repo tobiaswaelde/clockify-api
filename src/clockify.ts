@@ -3,32 +3,32 @@ import * as qs from 'qs';
 import {
 	ApprovalRequest,
 	ApprovalRequestResponse,
-	GetApprovalRequestsParams,
-	SubmitApprovalRequestData,
-	UpdateApprovalRequestData,
+	GetApprovalRequestsFilter,
+	SubmitApprovalRequestBody,
+	UpdateApprovalRequestBody,
 } from './types/approval';
 import { AuthType } from './types/auth';
 import {
-	AddClientRequestData,
+	AddClientRequestBody,
 	Client,
-	GetClientsParams,
-	UpdateClientParams,
-	UpdateClientRequestData,
+	GetClientsFilter,
+	UpdateClientFilter,
+	UpdateClientRequestBody,
 } from './types/client';
 import { CostRateRequest } from './types/cost-rate';
 import {
 	CustomField,
-	GetProjectCustomFieldsParams,
-	GetWorkspaceCustomFieldsParams,
-	SetCustomFieldRequiredRequestData,
+	GetProjectCustomFieldsFilter,
+	GetWorkspaceCustomFieldsFilter,
+	SetCustomFieldRequiredRequestBody,
 } from './types/custom-fields';
-import { AddGroupRequestBody, GetGroupParams, Group, UpdateGroupRequestBody } from './types/group';
+import { AddGroupRequestBody, GetGroupFilter, Group, UpdateGroupRequestBody } from './types/group';
 import { HourlyRateRequest } from './types/hourly-rate';
 import { MemberProfile, UpdateMemberProfileRequestBody } from './types/member-profile';
 import {
 	AddProjectRequestBody,
-	GetProjectParams,
-	GetProjectsParams,
+	GetProjectFilter,
+	GetProjectsFilter,
 	Project,
 	ProjectInfo,
 	UpdateProjectEstimateRequestBody,
@@ -36,11 +36,11 @@ import {
 	UpdateProjectRequestBody,
 	UpdateProjectTemplateRequestBody,
 } from './types/project';
-import { AddTagRequestBody, GetTagsParams, Tag, UpdateTagRequestBody } from './types/tag';
+import { AddTagRequestBody, GetTagsFilter, Tag, UpdateTagRequestBody } from './types/tag';
 import {
 	AddTaskParams,
 	AddTaskRequestBody,
-	GetTasksParams,
+	GetTasksFilter,
 	Task,
 	UpdateTaskBillableRateRequestBody,
 	UpdateTaskCostRateRequestBody,
@@ -49,11 +49,11 @@ import {
 } from './types/task';
 import {
 	AddUserPhotoResponse,
-	GetCurrentUserInfoParams,
+	GetCurrentUserInfoFilter,
 	UserInfo,
 	UpdateUserEmailRequestBody,
-	UpdateUserEmailParams,
-	GetUsersParams,
+	UpdateUserEmailFilter,
+	GetUsersFilter,
 	FilterWorkspaceUsersRequestBody,
 	UpdateUserCustomFieldRequestBody,
 	GetUserTeamManagerParams,
@@ -63,13 +63,13 @@ import {
 } from './types/user';
 import { UserCustomFieldValue } from './types/user-custom-field-value';
 import {
-	GetWebhooksParams,
+	GetWebhooksFilter,
 	Webhook,
-	CreateWebhookRequestData,
-	UpdateWebhookRequestData,
+	CreateWebhookRequestBody,
+	UpdateWebhookRequestBody,
 } from './types/webhook';
 import {
-	AddUserToWorkspaceParams,
+	AddUserToWorkspaceFilter,
 	AddUserToWorkspaceRequest,
 	AddWorkspaceRequest,
 	UpdateUserCostRateRequest,
@@ -105,7 +105,7 @@ export class Clockify {
 		return res.data satisfies AddUserPhotoResponse;
 	}
 
-	public static async getCurrentUserInfo(options?: GetCurrentUserInfoParams): Promise<UserInfo> {
+	public static async getCurrentUserInfo(options?: GetCurrentUserInfoFilter): Promise<UserInfo> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
 		const res = await this.http.get(`/v1/user?${q}`);
 		return res.data satisfies UserInfo;
@@ -135,7 +135,7 @@ export class Clockify {
 		workspaceId: string,
 		userId: string,
 		data: UpdateUserEmailRequestBody,
-		options?: UpdateUserEmailParams
+		options?: UpdateUserEmailFilter
 	): Promise<void> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
 		const res = await this.http.put(
@@ -145,7 +145,7 @@ export class Clockify {
 		return res.data;
 	}
 
-	public static async getUsers(workspaceId: string, options?: GetUsersParams): Promise<UserInfo[]> {
+	public static async getUsers(workspaceId: string, options?: GetUsersFilter): Promise<UserInfo[]> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
 		const res = await this.http.get(`/v1/workspaces/${workspaceId}/users?${q}`);
 		return res.data satisfies UserInfo[];
@@ -231,7 +231,7 @@ export class Clockify {
 	public static async addUserToWorkspace(
 		workspaceId: string,
 		data: AddUserToWorkspaceRequest,
-		options?: AddUserToWorkspaceParams
+		options?: AddUserToWorkspaceFilter
 	): Promise<Workspace> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
 		const res = await this.http.post(`/v1/workspaces/${workspaceId}/users?${q}`, data);
@@ -287,7 +287,7 @@ export class Clockify {
 
 	public static async getWebhooks(
 		workspaceId: string,
-		options?: GetWebhooksParams
+		options?: GetWebhooksFilter
 	): Promise<Webhook[]> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
 		const res = await this.http.get(`/v1/workspaces/${workspaceId}/webhooks?${q}`);
@@ -299,7 +299,7 @@ export class Clockify {
 	 */
 	public static async createWebhook(
 		workspaceId: string,
-		data: CreateWebhookRequestData
+		data: CreateWebhookRequestBody
 	): Promise<Webhook> {
 		const res = await this.http.post(`/v1/workspaces/${workspaceId}/webhooks`, data);
 		return res.data satisfies Webhook;
@@ -318,7 +318,7 @@ export class Clockify {
 	public static async updateWebhook(
 		workspaceId: string,
 		webhookId: string,
-		data: UpdateWebhookRequestData
+		data: UpdateWebhookRequestBody
 	): Promise<Webhook> {
 		const res = await this.http.put(`/v1/workspaces/${workspaceId}/webhooks/${webhookId}`, data);
 		return res.data satisfies Webhook;
@@ -335,7 +335,7 @@ export class Clockify {
 	//#region Approvals
 	public static async getApprovalRequests(
 		workspaceId: string,
-		options?: GetApprovalRequestsParams
+		options?: GetApprovalRequestsFilter
 	): Promise<ApprovalRequestResponse[]> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
 		const res = await this.http.get(`/v1/workspaces/${workspaceId}/approval-requests?${q}`);
@@ -344,7 +344,7 @@ export class Clockify {
 
 	public static async submitApprovalRequest(
 		workspaceId: string,
-		data: SubmitApprovalRequestData
+		data: SubmitApprovalRequestBody
 	): Promise<ApprovalRequest> {
 		const res = await this.http.post(`/v1/workspaces/${workspaceId}/approval-requests`, data);
 		return res.data satisfies ApprovalRequest;
@@ -353,7 +353,7 @@ export class Clockify {
 	public static async submitApprovalRequestForUser(
 		workspaceId: string,
 		userId: string,
-		data: SubmitApprovalRequestData
+		data: SubmitApprovalRequestBody
 	): Promise<ApprovalRequest> {
 		const res = await this.http.post(
 			`/v1/workspaces/${workspaceId}/approval-requests/users/${userId}`,
@@ -365,7 +365,7 @@ export class Clockify {
 	public static async updateApprovalRequest(
 		workspaceId: string,
 		approvalRequestId: string,
-		data: UpdateApprovalRequestData
+		data: UpdateApprovalRequestBody
 	): Promise<ApprovalRequest> {
 		const res = await this.http.patch(
 			`/v1/workspaces/${workspaceId}/approval-requests/${approvalRequestId}`,
@@ -377,14 +377,14 @@ export class Clockify {
 	//#region Clients
 	public static async getClients(
 		workspaceId: string,
-		options?: GetClientsParams
+		options?: GetClientsFilter
 	): Promise<Client[]> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
 		const res = await this.http.get(`/v1/workspaces/${workspaceId}/clients?${q}`);
 		return res.data satisfies Client[];
 	}
 
-	public static async addClient(workspaceId: string, data: AddClientRequestData): Promise<Client> {
+	public static async addClient(workspaceId: string, data: AddClientRequestBody): Promise<Client> {
 		const res = await this.http.post(`/v1/workspaces/${workspaceId}/clients`, data);
 		return res.data satisfies Client;
 	}
@@ -402,8 +402,8 @@ export class Clockify {
 	public static async updateClient(
 		workspaceId: string,
 		clientId: string,
-		data: UpdateClientRequestData,
-		options?: UpdateClientParams
+		data: UpdateClientRequestBody,
+		options?: UpdateClientFilter
 	): Promise<Client> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
 		const res = await this.http.put(`/v1/workspaces/${workspaceId}/clients/${clientId}?${q}`, data);
@@ -413,7 +413,7 @@ export class Clockify {
 	//#region Custom Fields
 	public static async getWorkspceCustomFields(
 		workspaceId: string,
-		options?: GetWorkspaceCustomFieldsParams
+		options?: GetWorkspaceCustomFieldsFilter
 	): Promise<CustomField[]> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
 		const res = await this.http.get(`/v1/workspaces/${workspaceId}/custom-fields?${q}`);
@@ -423,7 +423,7 @@ export class Clockify {
 	public static async setCustomFieldAsRequired(
 		workspaceId: string,
 		customFieldId: string,
-		data: SetCustomFieldRequiredRequestData
+		data: SetCustomFieldRequiredRequestBody
 	): Promise<CustomField> {
 		const res = await this.http.put(
 			`/v1/workspaces/${workspaceId}/custom-fields/${customFieldId}`,
@@ -435,7 +435,7 @@ export class Clockify {
 	public static async getCustomFields(
 		workspaceId: string,
 		projectId: string,
-		options?: GetProjectCustomFieldsParams
+		options?: GetProjectCustomFieldsFilter
 	): Promise<CustomField[]> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
 		const res = await this.http.get(
@@ -469,7 +469,7 @@ export class Clockify {
 	//#region Projects
 	public static async getProjects(
 		workspaceId: string,
-		options?: GetProjectsParams
+		options?: GetProjectsFilter
 	): Promise<Project[]> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
 		const res = await this.http.get(`/v1/workspaces/${workspaceId}/projects?${q}`);
@@ -492,7 +492,7 @@ export class Clockify {
 	public static async getProject(
 		workspaceId: string,
 		projectId: string,
-		options?: GetProjectParams
+		options?: GetProjectFilter
 	): Promise<Project> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
 		const res = await this.http.get(`/v1/workspaces/${workspaceId}/projects/${projectId}?${q}`);
@@ -574,7 +574,7 @@ export class Clockify {
 	public static async getTasks(
 		workspaceId: string,
 		projectId: string,
-		options?: GetTasksParams
+		options?: GetTasksFilter
 	): Promise<Task[]> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
 		const res = await this.http.get(
@@ -662,7 +662,7 @@ export class Clockify {
 	//#endregion
 	//TODO Scheduling
 	//#region Tags
-	public static async getTags(workspaceId: string, options?: GetTagsParams): Promise<Tag[]> {
+	public static async getTags(workspaceId: string, options?: GetTagsFilter): Promise<Tag[]> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
 		const res = await this.http.get(`/v1/workspaces/${workspaceId}/tags?${q}`);
 		return res.data satisfies Tag[];
@@ -694,7 +694,7 @@ export class Clockify {
 	//#endregion
 	//TODO Time Entries
 	//#region Groups
-	public static async getGroups(workspaceId: string, options?: GetGroupParams): Promise<Group[]> {
+	public static async getGroups(workspaceId: string, options?: GetGroupFilter): Promise<Group[]> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
 		const res = await this.http.get(`/v1/workspaces/${workspaceId}/user-groups?${q}`);
 		return res.data satisfies Group[];

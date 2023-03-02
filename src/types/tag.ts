@@ -5,7 +5,7 @@ export type Tag = {
 	workspaceId: string;
 };
 
-export type GetTagsParams = {
+export type GetTagsFilter = {
 	name?: string;
 	'strict-name-search'?: boolean;
 	excludeIds?: string[];

@@ -67,11 +67,11 @@ export type Webhook = {
 	workspaceId: string;
 };
 
-export type GetWebhooksParams = {
+export type GetWebhooksFilter = {
 	type: 'USER_CREATED' | 'SYSTEM' | 'ADDON';
 };
 
-export type CreateWebhookRequestData = {
+export type CreateWebhookRequestBody = {
 	name?: string;
 	triggerSource: string[];
 	triggerSourceType?: TriggerSourceType;
@@ -79,7 +79,7 @@ export type CreateWebhookRequestData = {
 	webhookEvent?: WebhookEvent;
 };
 
-export type UpdateWebhookRequestData = {
+export type UpdateWebhookRequestBody = {
 	name?: string;
 	triggerSource: string[];
 	triggerSourceType?: TriggerSourceType;

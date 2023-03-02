@@ -18,7 +18,7 @@ export type Task = {
 	userGroupIds: string[];
 };
 
-export type GetTasksParams = {
+export type GetTasksFilter = {
 	name?: string;
 	'strict-name-search'?: boolean;
 	'is-active'?: boolean;

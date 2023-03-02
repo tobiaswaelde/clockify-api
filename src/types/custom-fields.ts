@@ -36,17 +36,17 @@ export type CustomField = {
 	workspaceId: string;
 };
 
-export type GetWorkspaceCustomFieldsParams = {
+export type GetWorkspaceCustomFieldsFilter = {
 	name: string;
 	status: string;
 	entityType: string[];
 };
-export type GetProjectCustomFieldsParams = {
+export type GetProjectCustomFieldsFilter = {
 	status: string;
 	entityType?: string[];
 };
 
-export type SetCustomFieldRequiredRequestData = {
+export type SetCustomFieldRequiredRequestBody = {
 	allowedValues?: string[];
 	description?: string;
 	name: string;
@@ -58,7 +58,7 @@ export type SetCustomFieldRequiredRequestData = {
 	workspaceDefaultValue: unknown;
 };
 
-export type UpdateCustomFieldRequestData = {
+export type UpdateCustomFieldRequestBody = {
 	defaultValue: any;
 	status: CustomFieldStatus;
 };

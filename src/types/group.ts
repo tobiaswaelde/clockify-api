@@ -5,7 +5,7 @@ export type Group = {
 	workspaceId: string;
 };
 
-export type GetGroupParams = {
+export type GetGroupFilter = {
 	projectId?: string;
 	name?: string;
 	/**
