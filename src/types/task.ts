@@ -1,5 +1,5 @@
-import { CostRate } from './cost-rate';
-import { HourlyRate } from './hourly-rate';
+import { CostRate, CostRateRequest } from './cost-rate';
+import { HourlyRate, HourlyRateRequest } from './hourly-rate';
 import { SortOrder } from './sort-order';
 
 export type TaskStatus = 'ACTIVE' | 'DONE' | 'ALL';
@@ -102,4 +102,20 @@ export type UpdateTaskRequestBody = {
 	name: string;
 	status?: string;
 	userGroupIds: string[];
+};
+
+export type TaskRequest = {
+	assigneeId?: string;
+	assigneeIds?: string[];
+	billable?: boolean;
+	/** `>= 0` */
+	budgetEstimate?: number;
+	costRate?: CostRateRequest;
+	esimate?: string;
+	hourlyRate?: HourlyRateRequest;
+	id?: string;
+	name: string;
+	projectId?: string;
+	status?: string;
+	userGroupIds?: string[];
 };

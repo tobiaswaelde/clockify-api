@@ -1,4 +1,5 @@
-import { ProjectInfo } from './project';
+import { Duration } from './duration';
+import { Project } from './project';
 
 export type ExpenseCategory = {
 	archived: boolean;
@@ -20,9 +21,14 @@ export type ExpenseHydrated = {
 	id: string;
 	locked: boolean;
 	notes: string;
-	project: ProjectInfo;
+	project: Project;
 	quantity: number;
 	total: number;
 	userId: string;
 	workspaceId: string;
+};
+
+export type EstimateRequest = {
+	estimate: Duration;
+	type: 'AUTO' | 'MANUAL';
 };

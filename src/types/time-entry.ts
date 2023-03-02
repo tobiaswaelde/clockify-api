@@ -1,4 +1,4 @@
-import { ProjectInfo } from './project';
+import { Project } from './project';
 import { CustomFieldValue } from './custom-fields';
 import { CostRate } from './cost-rate';
 import { HourlyRate } from './hourly-rate';
@@ -14,7 +14,7 @@ export type TimeEntryInfo = {
 	description: string;
 	hourlyRate: HourlyRate;
 	id: string;
-	project: ProjectInfo;
+	project: Project;
 	tags: Tag[];
 	tasks: Task[];
 	timeInterval: TimeInterval;

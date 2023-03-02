@@ -15,6 +15,7 @@ import {
 	UpdateClientParams,
 	UpdateClientRequestData,
 } from './types/client';
+import { CostRateRequest } from './types/cost-rate';
 import {
 	CustomField,
 	GetProjectCustomFieldsParams,
@@ -22,7 +23,19 @@ import {
 	SetCustomFieldRequiredRequestData,
 } from './types/custom-fields';
 import { AddGroupRequestBody, GetGroupParams, Group, UpdateGroupRequestBody } from './types/group';
+import { HourlyRateRequest } from './types/hourly-rate';
 import { MemberProfile, UpdateMemberProfileRequestBody } from './types/member-profile';
+import {
+	AddProjectRequestBody,
+	GetProjectParams,
+	GetProjectsParams,
+	Project,
+	ProjectInfo,
+	UpdateProjectEstimateRequestBody,
+	UpdateProjectMembershipsRequestBody,
+	UpdateProjectRequestBody,
+	UpdateProjectTemplateRequestBody,
+} from './types/project';
 import { AddTagRequestBody, GetTagsParams, Tag, UpdateTagRequestBody } from './types/tag';
 import {
 	AddTaskParams,
@@ -453,7 +466,110 @@ export class Clockify {
 		return res.data satisfies CustomField;
 	}
 	//#endregion
-	// Project
+	//#region Projects
+	public static async getProjects(
+		workspaceId: string,
+		options?: GetProjectsParams
+	): Promise<Project[]> {
+		const q = qs.stringify(options, { encodeValuesOnly: true });
+		const res = await this.http.get(`/v1/workspaces/${workspaceId}/projects?${q}`);
+		return res.data satisfies Project[];
+	}
+
+	public static async addProject(
+		workspaceId: string,
+		data: AddProjectRequestBody
+	): Promise<ProjectInfo> {
+		const res = await this.http.post(`/v1/workspaces/${workspaceId}/projects`, data);
+		return res.data satisfies ProjectInfo;
+	}
+
+	public static async deleteProject(workspaceId: string, projectId: string): Promise<ProjectInfo> {
+		const res = await this.http.delete(`/v1/workspaces/${workspaceId}/projects/${projectId}`);
+		return res.data satisfies ProjectInfo;
+	}
+
+	public static async getProject(
+		workspaceId: string,
+		projectId: string,
+		options?: GetProjectParams
+	): Promise<Project> {
+		const q = qs.stringify(options, { encodeValuesOnly: true });
+		const res = await this.http.get(`/v1/workspaces/${workspaceId}/projects/${projectId}?${q}`);
+		return res.data satisfies Project;
+	}
+
+	public static async updateProject(
+		workspaceId: string,
+		projectId: string,
+		data: UpdateProjectRequestBody
+	): Promise<ProjectInfo> {
+		const res = await this.http.put(`/v1/workspaces/${workspaceId}/projects/${projectId}`, data);
+		return res.data satisfies ProjectInfo;
+	}
+
+	public static async updateProjectEstimate(
+		workspaceId: string,
+		projectId: string,
+		data: UpdateProjectEstimateRequestBody
+	): Promise<ProjectInfo> {
+		const res = await this.http.patch(
+			`/v1/workspaces/${workspaceId}/projects/${projectId}/estimate`,
+			data
+		);
+		return res.data satisfies ProjectInfo;
+	}
+
+	public static async updateProjectMemberships(
+		workspaceId: string,
+		projectId: string,
+		data: UpdateProjectMembershipsRequestBody
+	): Promise<ProjectInfo> {
+		const res = await this.http.patch(
+			`/v1/workspaces/${workspaceId}/projects/${projectId}/memberships`,
+			data
+		);
+		return res.data satisfies ProjectInfo;
+	}
+
+	public static async updateProjectTemplate(
+		workspaceId: string,
+		projectId: string,
+		data: UpdateProjectTemplateRequestBody
+	): Promise<ProjectInfo> {
+		const res = await this.http.patch(
+			`/v1/workspaces/${workspaceId}/projects/${projectId}/template`,
+			data
+		);
+		return res.data satisfies ProjectInfo;
+	}
+
+	public static async updateProjectUserCostRate(
+		workspaceId: string,
+		projectId: string,
+		userId: string,
+		data: CostRateRequest
+	): Promise<ProjectInfo> {
+		const res = await this.http.put(
+			`/v1/workspaces/${workspaceId}/projects/${projectId}/users/${userId}/cost-rate`,
+			data
+		);
+		return res.data satisfies ProjectInfo;
+	}
+
+	public static async updateProjectUserBillableRate(
+		workspaceId: string,
+		projectId: string,
+		userId: string,
+		data: HourlyRateRequest
+	): Promise<ProjectInfo> {
+		const res = await this.http.put(
+			`/v1/workspaces/${workspaceId}/projects/${projectId}/users/${userId}/hourly-rate`,
+			data
+		);
+		return res.data satisfies ProjectInfo;
+	}
+	//#endregion
 	//#region Tasks
 	public static async getTasks(
 		workspaceId: string,
@@ -544,7 +660,7 @@ export class Clockify {
 		return res.data satisfies Task;
 	}
 	//#endregion
-	// Scheduling
+	//TODO Scheduling
 	//#region Tags
 	public static async getTags(workspaceId: string, options?: GetTagsParams): Promise<Tag[]> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
@@ -576,7 +692,7 @@ export class Clockify {
 		return res.data satisfies Tag;
 	}
 	//#endregion
-	// Time Entries
+	//TODO Time Entries
 	//#region Groups
 	public static async getGroups(workspaceId: string, options?: GetGroupParams): Promise<Group[]> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
