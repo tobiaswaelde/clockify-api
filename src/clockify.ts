@@ -428,7 +428,7 @@ export class Clockify {
 	//#region Tags
 	public static async getTags(workspaceId: string, options?: GetTagsParams): Promise<Tag[]> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
-		const res = await this.http.get(`/v1/workspaces/${workspaceId}/tags`);
+		const res = await this.http.get(`/v1/workspaces/${workspaceId}/tags?${q}`);
 		return res.data satisfies Tag[];
 	}
 
