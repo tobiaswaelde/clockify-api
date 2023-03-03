@@ -6,6 +6,7 @@ export type CustomFieldType =
 	| 'DROPDOWN_MULTIPLE'
 	| 'CHECKBOX'
 	| 'LINK';
+export type SourceType = 'WORKSPACE' | 'PROJECT' | 'TIMEENTRY';
 
 export type CustomFieldValue = {
 	customFieldId: string;
@@ -61,4 +62,10 @@ export type SetCustomFieldRequiredRequestBody = {
 export type UpdateCustomFieldRequestBody = {
 	defaultValue: any;
 	status: CustomFieldStatus;
+};
+
+export type UpdateCustomFieldRequest = {
+	customFieldId: string;
+	sourceType?: SourceType;
+	value: any;
 };

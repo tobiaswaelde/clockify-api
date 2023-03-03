@@ -126,6 +126,18 @@ import {
 	InvoicesResponse,
 	SendInvoiceRequestBody,
 } from './types/invoice';
+import {
+	AddTimeEntryHeaders,
+	AddTimeEntryRequestBody,
+	BulkEditTimeEntriesFilter,
+	GetTimeEntriesForUserFilter,
+	GetTimeEntryFilter,
+	MarkTimeEntryInvoicedRequestBody,
+	StopCurrentRunningTimerRequestBody,
+	TimeEntry,
+	UpdateTimeEntryHeaders,
+	UpdateTimeEntryRequestBody,
+} from './types/time-entry';
 
 const BASE_URL = 'https://api.clockify.me/api/v1';
 
@@ -1028,7 +1040,123 @@ export class Clockify {
 		return res.data satisfies Tag;
 	}
 	//#endregion
-	//TODO Time Entries
+	//#region Time Entries
+	public static async addTimeEntry(
+		workspaceId: string,
+		data: AddTimeEntryRequestBody,
+		headers?: AddTimeEntryHeaders
+	): Promise<TimeEntry> {
+		const res = await this.http.post(`/workspaces/${workspaceId}/time-entries`, data, { headers });
+		return res.data satisfies TimeEntry;
+	}
+
+	public static async markTimeEntryInvoiced(
+		workspaceId: string,
+		data: MarkTimeEntryInvoicedRequestBody
+	): Promise<void> {
+		await this.http.patch(`/workspaces/${workspaceId}/time-entries/invoiced`, data);
+	}
+
+	public static async deleteTimeEntry(workspaceId: string, timeEntryId: string): Promise<void> {
+		await this.http.delete(`/workspaces/${workspaceId}/time-entries/${timeEntryId}`);
+	}
+
+	public static async getTimeEntry(
+		workspaceId: string,
+		timeEntryId: string,
+		filter?: GetTimeEntryFilter
+	): Promise<Partial<TimeEntry>> {
+		const q = qs.stringify(filter, { encodeValuesOnly: true });
+		const res = await this.http.get(`/workspaces/${workspaceId}/time-entries/${timeEntryId}?${q}`);
+		return res.data satisfies Partial<TimeEntry>;
+	}
+
+	public static async updateTimeEntry(
+		workspaceId: string,
+		timeEntryId: string,
+		data: UpdateTimeEntryRequestBody,
+		headers?: UpdateTimeEntryHeaders
+	): Promise<TimeEntry> {
+		const res = await this.http.put(
+			`/workspaces/${workspaceId}/time-entries/${timeEntryId}`,
+			data,
+			{ headers }
+		);
+		return res.data satisfies TimeEntry;
+	}
+
+	public static async deleteTimeEntriesForUser(
+		workspaceId: string,
+		userId: string,
+		timeEntryIds: string[]
+	): Promise<TimeEntry[]> {
+		const q = qs.stringify({ 'time-entry-ids': timeEntryIds }, { encodeValuesOnly: true });
+		const res = await this.http.delete(
+			`/workspaces/${workspaceId}/user/${userId}/time-entries?${q}`
+		);
+		return res.data satisfies TimeEntry[];
+	}
+
+	public static async getTimeEntriesForUser(
+		workspaceId: string,
+		userId: string,
+		filter?: GetTimeEntriesForUserFilter
+	): Promise<Partial<TimeEntry[]>> {
+		const q = qs.stringify(filter, { encodeValuesOnly: true });
+		const res = await this.http.get(`/workspaces/${workspaceId}/user/${userId}/time-entries?${q}`);
+		return res.data satisfies Partial<TimeEntry[]>;
+	}
+
+	public static async stopCurrentRunningTimer(
+		workspaceId: string,
+		userId: string,
+		data: StopCurrentRunningTimerRequestBody
+	): Promise<TimeEntry> {
+		const res = await this.http.patch(
+			`/workspaces/${workspaceId}/user/${userId}/time-entries`,
+			data
+		);
+		return res.data satisfies TimeEntry;
+	}
+
+	public static async addTimeEntryForUser(
+		workspaceId: string,
+		userId: string,
+		data: AddTimeEntryRequestBody,
+		headers?: AddTimeEntryHeaders
+	): Promise<TimeEntry> {
+		const res = await this.http.post(
+			`/workspaces/${workspaceId}/user/${userId}/time-entries`,
+			data,
+			{ headers }
+		);
+		return res.data satisfies TimeEntry;
+	}
+	public static async bulkEditTimeEntries(
+		workspaceId: string,
+		userId: string,
+		data: UpdateTimeEntryRequestBody[],
+		filters?: BulkEditTimeEntriesFilter
+	): Promise<Partial<TimeEntry>[]> {
+		const q = qs.stringify(filters, { encodeValuesOnly: true });
+		const res = await this.http.put(
+			`/workspaces/${workspaceId}/user/${userId}/time-entries?${q}`,
+			data
+		);
+		return res.data satisfies Partial<TimeEntry>[];
+	}
+
+	public static async duplicateTimeEntry(
+		workspaceId: string,
+		userId: string,
+		timeEntryId: string
+	): Promise<TimeEntry> {
+		const res = await this.http.post(
+			`/workspaces/${workspaceId}/user/${userId}/time-entries/${timeEntryId}/dusplicate`
+		);
+		return res.data satisfies TimeEntry;
+	}
+	//#endregion
 	//#region Groups
 	public static async getGroups(workspaceId: string, options?: GetGroupFilter): Promise<Group[]> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
