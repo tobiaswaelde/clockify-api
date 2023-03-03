@@ -113,6 +113,14 @@ import {
 	UpdateWorkspaceCostRateRequest,
 	Workspace,
 } from './types/workspace';
+import {
+	AddInvoiceRequestBody,
+	AddInvoiceResponse,
+	FilterInvoiceResponse,
+	FilterInvoicesRequestBody,
+	GetInvoicesFilter,
+	InvoicesResponse,
+} from './types/invoice';
 
 const BASE_URL = 'https://api.clockify.me/api/v1';
 
@@ -588,7 +596,32 @@ export class Clockify {
 		return res.data satisfies string[];
 	}
 	//#endregion
-	//TODO Invoice
+	//#region Invoices
+	public static async getInvoices(
+		workspaceId: string,
+		filter?: GetInvoicesFilter
+	): Promise<InvoicesResponse> {
+		const q = qs.stringify(filter, { encodeValuesOnly: true });
+		const res = await this.http.get(`/workspaces/${workspaceId}/invoices`);
+		return res.data satisfies InvoicesResponse;
+	}
+
+	public static async addInvoice(
+		workspaceId: string,
+		data: AddInvoiceRequestBody
+	): Promise<AddInvoiceResponse> {
+		const res = await this.http.post(`/workspaces/${workspaceId}/invoices`, data);
+		return res.data satisfies AddInvoiceResponse;
+	}
+
+	public static async filterInvoices(
+		workspaceId: string,
+		data: FilterInvoicesRequestBody
+	): Promise<FilterInvoiceResponse> {
+		const res = await this.http.post(`/workspaces/${workspaceId}/invoices/info`, data);
+		return res.data satisfies FilterInvoiceResponse;
+	}
+	//#endregion
 	//#region Projects
 	public static async getProjects(
 		workspaceId: string,
