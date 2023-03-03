@@ -485,6 +485,8 @@ export class Clockify {
 		return res.data satisfies CustomField;
 	}
 	//#endregion
+	//TODO Expense
+	//TODO Invoice
 	//#region Projects
 	public static async getProjects(
 		workspaceId: string,
