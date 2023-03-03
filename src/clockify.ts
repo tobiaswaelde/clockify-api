@@ -1,4 +1,11 @@
-import { GetExpenseCategoriesFilter, ExpenseCategoriesResponse } from './types/expense-category';
+import {
+	GetExpenseCategoriesFilter,
+	ExpenseCategoriesResponse,
+	AddExpenseCategoryRequestBody,
+	ExpenseCategory,
+	UpdateExpenseCategoryRequestBody,
+	ArchiveExpenseCategoryRequestBody,
+} from './types/expense-category';
 import axios from 'axios';
 import * as qs from 'qs';
 import {
@@ -36,6 +43,7 @@ import {
 	Expense,
 	ExpensesResponse,
 	GetExpensesFilter,
+	UpdateExpenseRequestBody,
 } from './types/expenses';
 import { AddGroupRequestBody, GetGroupFilter, Group, UpdateGroupRequestBody } from './types/group';
 import { HourlyRateRequest } from './types/hourly-rate';
@@ -106,13 +114,14 @@ import {
 	Workspace,
 } from './types/workspace';
 
-const BASE_URL = 'https://api.clockify.me/api';
+const BASE_URL = 'https://api.clockify.me/api/v1';
 
 export class Clockify {
 	private static http = axios.create({
 		baseURL: BASE_URL,
 	});
 
+	//#region Authentication
 	/**
 	 * Authenticate using API key
 	 * @param {string} key The API key or Addon key, `undefined` to remove authentication
@@ -121,19 +130,20 @@ export class Clockify {
 	public static authenticate(apiKey: string | undefined, authType: AuthType = AuthType.ApiKey) {
 		this.http.defaults.headers.common[authType] = apiKey;
 	}
+	//#endregion
 
 	//#region User
 	public static async addUserPhoto(image: string | Blob): Promise<AddUserPhotoResponse> {
 		const data = new FormData();
 		data.append('file', image);
 
-		const res = await this.http.post(`/v1/file/image`, data);
+		const res = await this.http.post(`/file/image`, data);
 		return res.data satisfies AddUserPhotoResponse;
 	}
 
 	public static async getCurrentUserInfo(options?: GetCurrentUserInfoFilter): Promise<UserInfo> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
-		const res = await this.http.get(`/v1/user?${q}`);
+		const res = await this.http.get(`/user?${q}`);
 		return res.data satisfies UserInfo;
 	}
 
@@ -141,7 +151,7 @@ export class Clockify {
 		workspaceId: string,
 		userId: string
 	): Promise<MemberProfile> {
-		const res = await this.http.get(`/v1/workspaces/${workspaceId}/member-profile/${userId}`);
+		const res = await this.http.get(`/workspaces/${workspaceId}/member-profile/${userId}`);
 		return res.data satisfies MemberProfile;
 	}
 
@@ -150,10 +160,7 @@ export class Clockify {
 		userId: string,
 		data: UpdateMemberProfileRequestBody
 	): Promise<MemberProfile> {
-		const res = await this.http.patch(
-			`/v1/workspaces/${workspaceId}/member-profile/${userId}`,
-			data
-		);
+		const res = await this.http.patch(`/workspaces/${workspaceId}/member-profile/${userId}`, data);
 		return res.data satisfies MemberProfile;
 	}
 
@@ -165,7 +172,7 @@ export class Clockify {
 	): Promise<void> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
 		const res = await this.http.put(
-			`/v1/workspaces/${workspaceId}/member-profile/${userId}/email?${q}`,
+			`/workspaces/${workspaceId}/member-profile/${userId}/email?${q}`,
 			data
 		);
 		return res.data;
@@ -173,7 +180,7 @@ export class Clockify {
 
 	public static async getUsers(workspaceId: string, options?: GetUsersFilter): Promise<UserInfo[]> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
-		const res = await this.http.get(`/v1/workspaces/${workspaceId}/users?${q}`);
+		const res = await this.http.get(`/workspaces/${workspaceId}/users?${q}`);
 		return res.data satisfies UserInfo[];
 	}
 
@@ -181,7 +188,7 @@ export class Clockify {
 		workspaceId: string,
 		data: FilterWorkspaceUsersRequestBody
 	): Promise<UserInfo> {
-		const res = await this.http.post(`/v1/workspaces/${workspaceId}/users/info`, data);
+		const res = await this.http.post(`/workspaces/${workspaceId}/users/info`, data);
 		return res.data satisfies UserInfo;
 	}
 
@@ -192,7 +199,7 @@ export class Clockify {
 		data: UpdateUserCustomFieldRequestBody
 	): Promise<UserCustomFieldValue> {
 		const res = await this.http.put(
-			`/v1/workspaces/${workspaceId}/users/${userId}/custom-field/${customFieldId}/value`,
+			`/workspaces/${workspaceId}/users/${userId}/custom-field/${customFieldId}/value`,
 			data
 		);
 		return res.data satisfies UserCustomFieldValue;
@@ -204,7 +211,7 @@ export class Clockify {
 		options?: GetUserTeamManagerParams
 	): Promise<UserInfo> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
-		const res = await this.http.get(`/v1/workspaces/${workspaceId}/users/${userId}/managers?${q}`);
+		const res = await this.http.get(`/workspaces/${workspaceId}/users/${userId}/managers?${q}`);
 		return res.data satisfies UserInfo;
 	}
 
@@ -213,7 +220,7 @@ export class Clockify {
 		userId: string,
 		data: RemoveUserManagerRequestBody
 	): Promise<void> {
-		await this.http.delete(`/v1/workspaces/${workspaceId}/users/${userId}/roles`, {
+		await this.http.delete(`/workspaces/${workspaceId}/users/${userId}/roles`, {
 			data,
 		});
 	}
@@ -223,18 +230,18 @@ export class Clockify {
 		userId: string,
 		data: GiveUserManagerRoleRequestBody
 	): Promise<GiveUserManagerRoleResponse> {
-		const res = await this.http.post(`/v1/workspaces/${workspaceId}/users/${userId}/roles`, data);
+		const res = await this.http.post(`/workspaces/${workspaceId}/users/${userId}/roles`, data);
 		return res.data satisfies GiveUserManagerRoleResponse;
 	}
 	//#endregion
 	//#region Workspaces
 	public static async getAllMyWorkspaces(): Promise<Workspace[]> {
-		const res = await this.http.get(`/v1/workspaces`);
+		const res = await this.http.get(`/workspaces`);
 		return res.data satisfies Workspace[];
 	}
 
 	public static async addWorkspace(workspace: AddWorkspaceRequest): Promise<Workspace> {
-		const res = await this.http.post(`/v1/workspaces`, workspace);
+		const res = await this.http.post(`/workspaces`, workspace);
 		return res.data satisfies Workspace;
 	}
 
@@ -242,7 +249,7 @@ export class Clockify {
 		workspaceId: string,
 		data: UpdateWorkspaceCostRateRequest
 	): Promise<Workspace> {
-		const res = await this.http.put(`/v1/workspaces/${workspaceId}/cost-rate`, data);
+		const res = await this.http.put(`/workspaces/${workspaceId}/cost-rate`, data);
 		return res.data satisfies Workspace;
 	}
 
@@ -250,7 +257,7 @@ export class Clockify {
 		workspaceId: string,
 		data: UpdateWorkspaceBillingRateRequest
 	): Promise<Workspace> {
-		const res = await this.http.put(`/v1/workspaces/${workspaceId}/hourly-rate`, data);
+		const res = await this.http.put(`/workspaces/${workspaceId}/hourly-rate`, data);
 		return res.data satisfies Workspace;
 	}
 
@@ -260,7 +267,7 @@ export class Clockify {
 		options?: AddUserToWorkspaceFilter
 	): Promise<Workspace> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
-		const res = await this.http.post(`/v1/workspaces/${workspaceId}/users?${q}`, data);
+		const res = await this.http.post(`/workspaces/${workspaceId}/users?${q}`, data);
 		return res.data satisfies Workspace;
 	}
 
@@ -268,7 +275,7 @@ export class Clockify {
 		workspaceId: string,
 		userId: string
 	): Promise<Workspace> {
-		const res = await this.http.delete(`/v1/workspaces/${workspaceId}/users/${userId}`);
+		const res = await this.http.delete(`/workspaces/${workspaceId}/users/${userId}`);
 		return res.data satisfies Workspace;
 	}
 
@@ -277,7 +284,7 @@ export class Clockify {
 		userId: string,
 		data: UpdateUserStatusRequest
 	): Promise<Workspace> {
-		const res = await this.http.put(`/v1/workspaces/${workspaceId}/users/${userId}`, data);
+		const res = await this.http.put(`/workspaces/${workspaceId}/users/${userId}`, data);
 		return res.data satisfies Workspace;
 	}
 
@@ -286,10 +293,7 @@ export class Clockify {
 		userId: string,
 		data: UpdateUserCostRateRequest
 	): Promise<Workspace> {
-		const res = await this.http.put(
-			`/v1/workspaces/${workspaceId}/users/${userId}/cost-rate`,
-			data
-		);
+		const res = await this.http.put(`/workspaces/${workspaceId}/users/${userId}/cost-rate`, data);
 		return res.data satisfies Workspace;
 	}
 
@@ -298,16 +302,13 @@ export class Clockify {
 		userId: string,
 		data: UpdateUserHourlyRateRequest
 	): Promise<Workspace> {
-		const res = await this.http.put(
-			`/v1/workspaces/${workspaceId}/users/${userId}/hourly-rate`,
-			data
-		);
+		const res = await this.http.put(`/workspaces/${workspaceId}/users/${userId}/hourly-rate`, data);
 		return res.data satisfies Workspace;
 	}
 	//#endregion
 	//#region Webhooks
 	public static async getWebhooksAddon(workspaceId: string, addonId?: string): Promise<Webhook[]> {
-		const res = await this.http.get(`/v1/workspaces/${workspaceId}/addons/${addonId}/webhooks`);
+		const res = await this.http.get(`/workspaces/${workspaceId}/addons/${addonId}/webhooks`);
 		return res.data satisfies Webhook[];
 	}
 
@@ -316,7 +317,7 @@ export class Clockify {
 		options?: GetWebhooksFilter
 	): Promise<Webhook[]> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
-		const res = await this.http.get(`/v1/workspaces/${workspaceId}/webhooks?${q}`);
+		const res = await this.http.get(`/workspaces/${workspaceId}/webhooks?${q}`);
 		return res.data satisfies Webhook[];
 	}
 
@@ -327,17 +328,17 @@ export class Clockify {
 		workspaceId: string,
 		data: CreateWebhookRequestBody
 	): Promise<Webhook> {
-		const res = await this.http.post(`/v1/workspaces/${workspaceId}/webhooks`, data);
+		const res = await this.http.post(`/workspaces/${workspaceId}/webhooks`, data);
 		return res.data satisfies Webhook;
 	}
 
 	public static async deleteWebhook(workspaceId: string, webhookId: string): Promise<Webhook> {
-		const res = await this.http.delete(`/v1/workspaces/${workspaceId}/webhooks/${webhookId}`);
+		const res = await this.http.delete(`/workspaces/${workspaceId}/webhooks/${webhookId}`);
 		return res.data as Webhook;
 	}
 
 	public static async getWebhook(workspaceId: string, webhookId: string): Promise<Webhook> {
-		const res = await this.http.get(`/v1/workspaces/${workspaceId}/webhooks/${webhookId}`);
+		const res = await this.http.get(`/workspaces/${workspaceId}/webhooks/${webhookId}`);
 		return res.data satisfies Webhook;
 	}
 
@@ -346,7 +347,7 @@ export class Clockify {
 		webhookId: string,
 		data: UpdateWebhookRequestBody
 	): Promise<Webhook> {
-		const res = await this.http.put(`/v1/workspaces/${workspaceId}/webhooks/${webhookId}`, data);
+		const res = await this.http.put(`/workspaces/${workspaceId}/webhooks/${webhookId}`, data);
 		return res.data satisfies Webhook;
 	}
 
@@ -354,7 +355,7 @@ export class Clockify {
 		workspaceId: string,
 		webhookId: string
 	): Promise<Webhook> {
-		const res = await this.http.patch(`/v1/workspaces/${workspaceId}/webhooks/${webhookId}/token`);
+		const res = await this.http.patch(`/workspaces/${workspaceId}/webhooks/${webhookId}/token`);
 		return res.data satisfies Webhook;
 	}
 	//#endregion
@@ -364,7 +365,7 @@ export class Clockify {
 		options?: GetApprovalRequestsFilter
 	): Promise<ApprovalRequestResponse[]> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
-		const res = await this.http.get(`/v1/workspaces/${workspaceId}/approval-requests?${q}`);
+		const res = await this.http.get(`/workspaces/${workspaceId}/approval-requests?${q}`);
 		return res.data satisfies ApprovalRequestResponse[];
 	}
 
@@ -372,7 +373,7 @@ export class Clockify {
 		workspaceId: string,
 		data: SubmitApprovalRequestBody
 	): Promise<ApprovalRequest> {
-		const res = await this.http.post(`/v1/workspaces/${workspaceId}/approval-requests`, data);
+		const res = await this.http.post(`/workspaces/${workspaceId}/approval-requests`, data);
 		return res.data satisfies ApprovalRequest;
 	}
 
@@ -382,7 +383,7 @@ export class Clockify {
 		data: SubmitApprovalRequestBody
 	): Promise<ApprovalRequest> {
 		const res = await this.http.post(
-			`/v1/workspaces/${workspaceId}/approval-requests/users/${userId}`,
+			`/workspaces/${workspaceId}/approval-requests/users/${userId}`,
 			data
 		);
 		return res.data satisfies ApprovalRequest;
@@ -394,7 +395,7 @@ export class Clockify {
 		data: UpdateApprovalRequestBody
 	): Promise<ApprovalRequest> {
 		const res = await this.http.patch(
-			`/v1/workspaces/${workspaceId}/approval-requests/${approvalRequestId}`,
+			`/workspaces/${workspaceId}/approval-requests/${approvalRequestId}`,
 			data
 		);
 		return res.data as ApprovalRequest;
@@ -406,22 +407,22 @@ export class Clockify {
 		options?: GetClientsFilter
 	): Promise<Client[]> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
-		const res = await this.http.get(`/v1/workspaces/${workspaceId}/clients?${q}`);
+		const res = await this.http.get(`/workspaces/${workspaceId}/clients?${q}`);
 		return res.data satisfies Client[];
 	}
 
 	public static async addClient(workspaceId: string, data: AddClientRequestBody): Promise<Client> {
-		const res = await this.http.post(`/v1/workspaces/${workspaceId}/clients`, data);
+		const res = await this.http.post(`/workspaces/${workspaceId}/clients`, data);
 		return res.data satisfies Client;
 	}
 
 	public static async deleteClient(workspaceId: string, clientId: string): Promise<Client> {
-		const res = await this.http.delete(`/v1/workspaces/${workspaceId}/clients/${clientId}`);
+		const res = await this.http.delete(`/workspaces/${workspaceId}/clients/${clientId}`);
 		return res.data satisfies Client;
 	}
 
 	public static async getClient(workspaceId: string, clientId: string): Promise<Client> {
-		const res = await this.http.get(`/v1/workspaces/${workspaceId}/clients/${clientId}`);
+		const res = await this.http.get(`/workspaces/${workspaceId}/clients/${clientId}`);
 		return res.data satisfies Client;
 	}
 
@@ -432,7 +433,7 @@ export class Clockify {
 		options?: UpdateClientFilter
 	): Promise<Client> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
-		const res = await this.http.put(`/v1/workspaces/${workspaceId}/clients/${clientId}?${q}`, data);
+		const res = await this.http.put(`/workspaces/${workspaceId}/clients/${clientId}?${q}`, data);
 		return res.data satisfies Client;
 	}
 	//#endregion
@@ -442,7 +443,7 @@ export class Clockify {
 		options?: GetWorkspaceCustomFieldsFilter
 	): Promise<CustomField[]> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
-		const res = await this.http.get(`/v1/workspaces/${workspaceId}/custom-fields?${q}`);
+		const res = await this.http.get(`/workspaces/${workspaceId}/custom-fields?${q}`);
 		return res.data satisfies CustomField[];
 	}
 
@@ -452,7 +453,7 @@ export class Clockify {
 		data: SetCustomFieldRequiredRequestBody
 	): Promise<CustomField> {
 		const res = await this.http.put(
-			`/v1/workspaces/${workspaceId}/custom-fields/${customFieldId}`,
+			`/workspaces/${workspaceId}/custom-fields/${customFieldId}`,
 			data
 		);
 		return res.data satisfies CustomField;
@@ -465,7 +466,7 @@ export class Clockify {
 	): Promise<CustomField[]> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
 		const res = await this.http.get(
-			`/v1/workspaces/${workspaceId}/projects/${projectId}/custom-fields?${q}`
+			`/workspaces/${workspaceId}/projects/${projectId}/custom-fields?${q}`
 		);
 		return res.data satisfies CustomField[];
 	}
@@ -476,7 +477,7 @@ export class Clockify {
 		customFieldId: string
 	): Promise<CustomField> {
 		const res = await this.http.delete(
-			`/v1/workspaces/${workspaceId}/projects/${projectId}/custom-fields`
+			`/workspaces/${workspaceId}/projects/${projectId}/custom-fields`
 		);
 		return res.data satisfies CustomField;
 	}
@@ -487,7 +488,7 @@ export class Clockify {
 		customFieldId: string
 	): Promise<CustomField> {
 		const res = await this.http.patch(
-			`/v1/workspace/${workspaceId}/projects/${projectId}/custom-fields/${customFieldId}`
+			`/workspace/${workspaceId}/projects/${projectId}/custom-fields/${customFieldId}`
 		);
 		return res.data satisfies CustomField;
 	}
@@ -498,7 +499,7 @@ export class Clockify {
 		filter?: GetExpensesFilter
 	): Promise<ExpensesResponse> {
 		const q = qs.stringify(filter, { encodeValuesOnly: true });
-		const res = await this.http.get(`/v1/workspaces/${workspaceId}/expenses?${q}`);
+		const res = await this.http.get(`/workspaces/${workspaceId}/expenses?${q}`);
 		return res.data satisfies ExpensesResponse;
 	}
 
@@ -506,7 +507,7 @@ export class Clockify {
 		workspaceId: string,
 		data: CreateExpenseRequestBody
 	): Promise<Expense> {
-		const res = await this.http.post(`/v1/workspaces/${workspaceId}/expenses`, data);
+		const res = await this.http.post(`/workspaces/${workspaceId}/expenses`, data);
 		return res.data satisfies Expense;
 	}
 
@@ -515,18 +516,77 @@ export class Clockify {
 		filter?: GetExpenseCategoriesFilter
 	): Promise<ExpenseCategoriesResponse> {
 		const q = qs.stringify(filter, { encodeValuesOnly: true });
-		const res = await this.http.get(`/v1/workspaces/${workspaceId}/expenses/categories?${q}`);
+		const res = await this.http.get(`/workspaces/${workspaceId}/expenses/categories?${q}`);
 		return res.data satisfies ExpenseCategoriesResponse;
 	}
 
-	public static async addExpenseCategory() {}
-	public static async deleteExpenseCategory() {}
-	public static async updateExpenseCategory() {}
-	public static async archiveExpenseCategory() {}
-	public static async deleteExpense() {}
-	public static async getExpense() {}
-	public static async updateExpense() {}
-	public static async downloadReceipt() {}
+	public static async addExpenseCategory(
+		workspaceId: string,
+		data: AddExpenseCategoryRequestBody
+	): Promise<ExpenseCategory> {
+		const res = await this.http.post(`/workspaces/${workspaceId}/expenses/categories`, data);
+		return res.data satisfies ExpenseCategory;
+	}
+
+	public static async deleteExpenseCategory(
+		workspaceId: string,
+		categoryId: string
+	): Promise<void> {
+		await this.http.delete(`/workspaces/${workspaceId}/expenses/categories/${categoryId}`);
+	}
+
+	public static async updateExpenseCategory(
+		workspaceId: string,
+		categoryId: string,
+		data: UpdateExpenseCategoryRequestBody
+	): Promise<ExpenseCategory> {
+		const res = await this.http.put(
+			`/workspaces/${workspaceId}/expenses/categories/${categoryId}`,
+			data
+		);
+		return res.data satisfies ExpenseCategory;
+	}
+
+	public static async archiveExpenseCategory(
+		workspaceId: string,
+		categoryId: string,
+		data: ArchiveExpenseCategoryRequestBody
+	): Promise<ExpenseCategory> {
+		const res = await this.http.patch(
+			`/workspaces/${workspaceId}/expenses/categories/${categoryId}`,
+			data
+		);
+		return res.data satisfies ExpenseCategory;
+	}
+
+	public static async deleteExpense(workspaceId: string, expenseId: string): Promise<void> {
+		await this.http.delete(`/workspaces/${workspaceId}/expenses/${expenseId}`);
+	}
+
+	public static async getExpense(workspaceId: string, expenseId: string): Promise<Expense> {
+		const res = await this.http.get(`/workspaces/${workspaceId}/expenses/${expenseId}`);
+		return res.data satisfies Expense;
+	}
+
+	public static async updateExpense(
+		workspaceId: string,
+		expenseId: string,
+		data: UpdateExpenseRequestBody
+	): Promise<Expense> {
+		const res = await this.http.put(`/workspaces/${workspaceId}/expenses/${expenseId}`, data);
+		return res.data satisfies Expense;
+	}
+
+	public static async downloadReceipt(
+		workspaceId: string,
+		expenseId: string,
+		fileId: string
+	): Promise<string[]> {
+		const res = await this.http.get(
+			`/workspaces/${workspaceId}/expenses/${expenseId}/files/${fileId}`
+		);
+		return res.data satisfies string[];
+	}
 	//#endregion
 	//TODO Invoice
 	//#region Projects
@@ -535,7 +595,7 @@ export class Clockify {
 		options?: GetProjectsFilter
 	): Promise<Project[]> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
-		const res = await this.http.get(`/v1/workspaces/${workspaceId}/projects?${q}`);
+		const res = await this.http.get(`/workspaces/${workspaceId}/projects?${q}`);
 		return res.data satisfies Project[];
 	}
 
@@ -543,12 +603,12 @@ export class Clockify {
 		workspaceId: string,
 		data: AddProjectRequestBody
 	): Promise<ProjectInfo> {
-		const res = await this.http.post(`/v1/workspaces/${workspaceId}/projects`, data);
+		const res = await this.http.post(`/workspaces/${workspaceId}/projects`, data);
 		return res.data satisfies ProjectInfo;
 	}
 
 	public static async deleteProject(workspaceId: string, projectId: string): Promise<ProjectInfo> {
-		const res = await this.http.delete(`/v1/workspaces/${workspaceId}/projects/${projectId}`);
+		const res = await this.http.delete(`/workspaces/${workspaceId}/projects/${projectId}`);
 		return res.data satisfies ProjectInfo;
 	}
 
@@ -558,7 +618,7 @@ export class Clockify {
 		options?: GetProjectFilter
 	): Promise<Project> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
-		const res = await this.http.get(`/v1/workspaces/${workspaceId}/projects/${projectId}?${q}`);
+		const res = await this.http.get(`/workspaces/${workspaceId}/projects/${projectId}?${q}`);
 		return res.data satisfies Project;
 	}
 
@@ -567,7 +627,7 @@ export class Clockify {
 		projectId: string,
 		data: UpdateProjectRequestBody
 	): Promise<ProjectInfo> {
-		const res = await this.http.put(`/v1/workspaces/${workspaceId}/projects/${projectId}`, data);
+		const res = await this.http.put(`/workspaces/${workspaceId}/projects/${projectId}`, data);
 		return res.data satisfies ProjectInfo;
 	}
 
@@ -577,7 +637,7 @@ export class Clockify {
 		data: UpdateProjectEstimateRequestBody
 	): Promise<ProjectInfo> {
 		const res = await this.http.patch(
-			`/v1/workspaces/${workspaceId}/projects/${projectId}/estimate`,
+			`/workspaces/${workspaceId}/projects/${projectId}/estimate`,
 			data
 		);
 		return res.data satisfies ProjectInfo;
@@ -589,7 +649,7 @@ export class Clockify {
 		data: UpdateProjectMembershipsRequestBody
 	): Promise<ProjectInfo> {
 		const res = await this.http.patch(
-			`/v1/workspaces/${workspaceId}/projects/${projectId}/memberships`,
+			`/workspaces/${workspaceId}/projects/${projectId}/memberships`,
 			data
 		);
 		return res.data satisfies ProjectInfo;
@@ -601,7 +661,7 @@ export class Clockify {
 		data: UpdateProjectTemplateRequestBody
 	): Promise<ProjectInfo> {
 		const res = await this.http.patch(
-			`/v1/workspaces/${workspaceId}/projects/${projectId}/template`,
+			`/workspaces/${workspaceId}/projects/${projectId}/template`,
 			data
 		);
 		return res.data satisfies ProjectInfo;
@@ -614,7 +674,7 @@ export class Clockify {
 		data: CostRateRequest
 	): Promise<ProjectInfo> {
 		const res = await this.http.put(
-			`/v1/workspaces/${workspaceId}/projects/${projectId}/users/${userId}/cost-rate`,
+			`/workspaces/${workspaceId}/projects/${projectId}/users/${userId}/cost-rate`,
 			data
 		);
 		return res.data satisfies ProjectInfo;
@@ -627,7 +687,7 @@ export class Clockify {
 		data: HourlyRateRequest
 	): Promise<ProjectInfo> {
 		const res = await this.http.put(
-			`/v1/workspaces/${workspaceId}/projects/${projectId}/users/${userId}/hourly-rate`,
+			`/workspaces/${workspaceId}/projects/${projectId}/users/${userId}/hourly-rate`,
 			data
 		);
 		return res.data satisfies ProjectInfo;
@@ -640,9 +700,7 @@ export class Clockify {
 		options?: GetTasksFilter
 	): Promise<Task[]> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
-		const res = await this.http.get(
-			`/v1/workspaces/${workspaceId}/projects/${projectId}/tasks?${q}`
-		);
+		const res = await this.http.get(`/workspaces/${workspaceId}/projects/${projectId}/tasks?${q}`);
 		return res.data satisfies Task[];
 	}
 
@@ -654,7 +712,7 @@ export class Clockify {
 	): Promise<Task> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
 		const res = await this.http.post(
-			`/v1/workspaces/${workspaceId}/projects/${projectId}/tasks?${q}`,
+			`/workspaces/${workspaceId}/projects/${projectId}/tasks?${q}`,
 			data
 		);
 		return res.data satisfies Task;
@@ -667,7 +725,7 @@ export class Clockify {
 		data: UpdateTaskCostRateRequestBody
 	): Promise<Task> {
 		const res = await this.http.put(
-			`/v1/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}/cost-rate`,
+			`/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}/cost-rate`,
 			data
 		);
 		return res.data satisfies Task;
@@ -680,7 +738,7 @@ export class Clockify {
 		data: UpdateTaskBillableRateRequestBody
 	): Promise<Task> {
 		const res = await this.http.put(
-			`/v1/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}/hourly-rate`,
+			`/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}/hourly-rate`,
 			data
 		);
 		return res.data satisfies Task;
@@ -692,7 +750,7 @@ export class Clockify {
 		taskId: string
 	): Promise<Task> {
 		const res = await this.http.delete(
-			`/v1/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}`
+			`/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}`
 		);
 		return res.data satisfies Task;
 	}
@@ -703,7 +761,7 @@ export class Clockify {
 		taskId: string
 	): Promise<Task> {
 		const res = await this.http.get(
-			`/v1/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}`
+			`/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}`
 		);
 		return res.data satisfies Task;
 	}
@@ -717,7 +775,7 @@ export class Clockify {
 	): Promise<Task> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
 		const res = await this.http.put(
-			`/v1/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}?${q}`,
+			`/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}?${q}`,
 			data
 		);
 		return res.data satisfies Task;
@@ -729,9 +787,7 @@ export class Clockify {
 		filter?: GetAssignmentsFilter
 	): Promise<Assignment[]> {
 		const q = qs.stringify(filter, { encodeValuesOnly: true });
-		const res = await this.http.get(
-			`/v1/workspaces/${workspaceId}/scheduling/assignments/all?${q}`
-		);
+		const res = await this.http.get(`/workspaces/${workspaceId}/scheduling/assignments/all?${q}`);
 		return res.data satisfies Assignment[];
 	}
 
@@ -741,7 +797,7 @@ export class Clockify {
 	): Promise<ScheduledAssignment[]> {
 		const q = qs.stringify(filter, { encodeValuesOnly: true });
 		const res = await this.http.get(
-			`/v1/workspaces/${workspaceId}/scheduling/assignments/projects/totals?${q}`
+			`/workspaces/${workspaceId}/scheduling/assignments/projects/totals?${q}`
 		);
 		return res.data satisfies ScheduledAssignment[];
 	}
@@ -753,7 +809,7 @@ export class Clockify {
 	): Promise<ScheduledAssignment[]> {
 		const q = qs.stringify(filter, { encodeValuesOnly: true });
 		const res = await this.http.get(
-			`/v1/workspaces/${workspaceId}/scheduling/assignments/projects/totals/${projectId}?${q}`
+			`/workspaces/${workspaceId}/scheduling/assignments/projects/totals/${projectId}?${q}`
 		);
 		return res.data satisfies ScheduledAssignment[];
 	}
@@ -762,7 +818,7 @@ export class Clockify {
 		workspaceId: string,
 		data: PublishAssignmentRequestBody
 	): Promise<void> {
-		await this.http.put(`/v1/workspaces/${workspaceId}/scheduling/assignments/publish`, data);
+		await this.http.put(`/workspaces/${workspaceId}/scheduling/assignments/publish`, data);
 	}
 
 	public static async createRecurringAssignment(
@@ -770,7 +826,7 @@ export class Clockify {
 		data: CreateRecurringAssignmentRequestBody
 	): Promise<RecurringAssignment> {
 		const res = await this.http.post(
-			`/v1/workspaces/${workspaceId}/scheduling/assignments/recurring`,
+			`/workspaces/${workspaceId}/scheduling/assignments/recurring`,
 			data
 		);
 		return res.data satisfies RecurringAssignment;
@@ -782,7 +838,7 @@ export class Clockify {
 		data: DeleteRecurringAssignmentRequestBody
 	): Promise<RecurringAssignment[]> {
 		const res = await this.http.delete(
-			`/v1/workspaces/${workspaceId}/scheduling/assignments/recurring/${assignmentId}`,
+			`/workspaces/${workspaceId}/scheduling/assignments/recurring/${assignmentId}`,
 			{ data }
 		);
 		return res.data satisfies RecurringAssignment[];
@@ -794,7 +850,7 @@ export class Clockify {
 		data: UpdateRecurringAssignmentRequestBody
 	): Promise<RecurringAssignment> {
 		const res = await this.http.patch(
-			`/v1/workspaces/${workspaceId}/scheduling/assignments/recurring/${assignmentId}`,
+			`/workspaces/${workspaceId}/scheduling/assignments/recurring/${assignmentId}`,
 			data
 		);
 		return res.data satisfies RecurringAssignment;
@@ -806,7 +862,7 @@ export class Clockify {
 		data: ChangeRecurringAssignmentPeriodRequestBody
 	): Promise<RecurringAssignment> {
 		const res = await this.http.put(
-			`/v1/workspaces/${workspaceId}/scheduling/assignments/series/${assignmentId}`,
+			`/workspaces/${workspaceId}/scheduling/assignments/series/${assignmentId}`,
 			data
 		);
 		return res.data satisfies RecurringAssignment;
@@ -817,7 +873,7 @@ export class Clockify {
 		data: GetTotalUserCapacityRequestBody
 	): Promise<UserCapacity> {
 		const res = await this.http.post(
-			`/v1/workspaces/${workspaceId}/scheduling/assignments/user-filter/totals`,
+			`/workspaces/${workspaceId}/scheduling/assignments/user-filter/totals`,
 			data
 		);
 		return res.data satisfies UserCapacity;
@@ -830,7 +886,7 @@ export class Clockify {
 	): Promise<UserCapacity> {
 		const q = qs.stringify(filter, { encodeValuesOnly: true });
 		const res = await this.http.get(
-			`/v1/workspaces/${workspaceId}/scheduling/assignment/users/${userId}/totals?${q}`
+			`/workspaces/${workspaceId}/scheduling/assignment/users/${userId}/totals?${q}`
 		);
 		return res.data satisfies UserCapacity;
 	}
@@ -841,7 +897,7 @@ export class Clockify {
 		data: CopyScheduledAssignmentRequestBody
 	): Promise<RecurringAssignment> {
 		const res = await this.http.post(
-			`/v1/workspaces/${workspaceId}/scheduling/assignments/${assignmentId}/copy`,
+			`/workspaces/${workspaceId}/scheduling/assignments/${assignmentId}/copy`,
 			data
 		);
 		return res.data satisfies RecurringAssignment;
@@ -850,22 +906,22 @@ export class Clockify {
 	//#region Tags
 	public static async getTags(workspaceId: string, options?: GetTagsFilter): Promise<Tag[]> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
-		const res = await this.http.get(`/v1/workspaces/${workspaceId}/tags?${q}`);
+		const res = await this.http.get(`/workspaces/${workspaceId}/tags?${q}`);
 		return res.data satisfies Tag[];
 	}
 
 	public static async addTag(workspaceId: string, data: AddTagRequestBody): Promise<Tag> {
-		const res = await this.http.post(`/v1/workspaces/${workspaceId}/tags`, data);
+		const res = await this.http.post(`/workspaces/${workspaceId}/tags`, data);
 		return res.data satisfies Tag;
 	}
 
 	public static async deleteTag(workspaceId: string, tagId: string): Promise<Tag> {
-		const res = await this.http.post(`/v1/workspaces/${workspaceId}/tags/${tagId}`);
+		const res = await this.http.post(`/workspaces/${workspaceId}/tags/${tagId}`);
 		return res.data satisfies Tag;
 	}
 
 	public static async getTag(workspaceId: string, tagId: string): Promise<Tag> {
-		const res = await this.http.get(`/v1/workspaces/${workspaceId}/tags/${tagId}`);
+		const res = await this.http.get(`/workspaces/${workspaceId}/tags/${tagId}`);
 		return res.data satisfies Tag;
 	}
 
@@ -874,7 +930,7 @@ export class Clockify {
 		tagId: string,
 		data: UpdateTagRequestBody
 	): Promise<Tag> {
-		const res = await this.http.put(`/v1/workspaces/${workspaceId}/tags/${tagId}`, data);
+		const res = await this.http.put(`/workspaces/${workspaceId}/tags/${tagId}`, data);
 		return res.data satisfies Tag;
 	}
 	//#endregion
@@ -882,17 +938,17 @@ export class Clockify {
 	//#region Groups
 	public static async getGroups(workspaceId: string, options?: GetGroupFilter): Promise<Group[]> {
 		const q = qs.stringify(options, { encodeValuesOnly: true });
-		const res = await this.http.get(`/v1/workspaces/${workspaceId}/user-groups?${q}`);
+		const res = await this.http.get(`/workspaces/${workspaceId}/user-groups?${q}`);
 		return res.data satisfies Group[];
 	}
 
 	public static async addGroup(workspaceId: string, data: AddGroupRequestBody): Promise<Group> {
-		const res = await this.http.post(`/v1/workspaces/${workspaceId}/user-groups`, data);
+		const res = await this.http.post(`/workspaces/${workspaceId}/user-groups`, data);
 		return res.data satisfies Group;
 	}
 
 	public static async deleteGroup(workspaceId: string, groupId: string): Promise<Group> {
-		const res = await this.http.delete(`/v1/workspaces/${workspaceId}/user-groups/${groupId}`);
+		const res = await this.http.delete(`/workspaces/${workspaceId}/user-groups/${groupId}`);
 		return res.data satisfies Group;
 	}
 
@@ -901,7 +957,7 @@ export class Clockify {
 		groupId: string,
 		data: UpdateGroupRequestBody
 	): Promise<Group> {
-		const res = await this.http.put(`/v1/workspaces/${workspaceId}/user-groups/${groupId}`, data);
+		const res = await this.http.put(`/workspaces/${workspaceId}/user-groups/${groupId}`, data);
 		return res.data satisfies Group;
 	}
 
@@ -910,7 +966,7 @@ export class Clockify {
 		groupId: string,
 		userId: string
 	): Promise<Group> {
-		const res = await this.http.post(`/v1/workspaces/${workspaceId}/user-groups/${groupId}/users`, {
+		const res = await this.http.post(`/workspaces/${workspaceId}/user-groups/${groupId}/users`, {
 			userId,
 		});
 		return res.data satisfies Group;
@@ -922,7 +978,7 @@ export class Clockify {
 		userId: string
 	): Promise<Group> {
 		const res = await this.http.delete(
-			`/v1/workspaces/${workspaceId}/user-groups/${groupId}/users/${userId}`
+			`/workspaces/${workspaceId}/user-groups/${groupId}/users/${userId}`
 		);
 		return res.data satisfies Group;
 	}

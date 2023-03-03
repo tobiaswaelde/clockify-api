@@ -41,3 +41,23 @@ export type GetExpenseCategoriesFilter = {
 	archived?: boolean;
 	name?: string;
 };
+
+export type AddExpenseCategoryRequestBody = {
+	hasUnitPrice?: boolean;
+	/** [0..250] characters */
+	name: string;
+	priceInCents?: number;
+	unit?: string;
+};
+
+export type UpdateExpenseCategoryRequestBody = {
+	hasUnitPrice?: boolean;
+	/** [0..250] characters */
+	name: string;
+	priceInCents?: number;
+	unit?: string;
+};
+
+export type ArchiveExpenseCategoryRequestBody = {
+	archived: boolean;
+};

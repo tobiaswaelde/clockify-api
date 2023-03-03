@@ -85,3 +85,25 @@ export type CreateExpenseRequestBody = {
 	projectId?: string;
 	userId?: string;
 };
+
+export type ExpenseChangeField =
+	| 'USER'
+	| 'DATE'
+	| 'PROJECT'
+	| 'CATEGORY'
+	| 'NOTES'
+	| 'AMOUNT'
+	| 'BILLABLE'
+	| 'FILE';
+export type UpdateExpenseRequestBody = {
+	amount?: number;
+	billable?: boolean;
+	categoryId?: string;
+	changeFields?: ExpenseChangeField[];
+	date?: string;
+	file?: string;
+	/** [0..3000] characters */
+	notes?: string;
+	projectId?: string;
+	userId?: string;
+};
