@@ -1,3 +1,4 @@
+import { GetExpenseCategoriesFilter, ExpenseCategoriesResponse } from './types/expense-category';
 import axios from 'axios';
 import * as qs from 'qs';
 import {
@@ -30,6 +31,12 @@ import {
 	GetWorkspaceCustomFieldsFilter,
 	SetCustomFieldRequiredRequestBody,
 } from './types/custom-fields';
+import {
+	CreateExpenseRequestBody,
+	Expense,
+	ExpensesResponse,
+	GetExpensesFilter,
+} from './types/expenses';
 import { AddGroupRequestBody, GetGroupFilter, Group, UpdateGroupRequestBody } from './types/group';
 import { HourlyRateRequest } from './types/hourly-rate';
 import { MemberProfile, UpdateMemberProfileRequestBody } from './types/member-profile';
@@ -485,7 +492,42 @@ export class Clockify {
 		return res.data satisfies CustomField;
 	}
 	//#endregion
-	//TODO Expense
+	//#region Expenses
+	public static async getExpenses(
+		workspaceId: string,
+		filter?: GetExpensesFilter
+	): Promise<ExpensesResponse> {
+		const q = qs.stringify(filter, { encodeValuesOnly: true });
+		const res = await this.http.get(`/v1/workspaces/${workspaceId}/expenses?${q}`);
+		return res.data satisfies ExpensesResponse;
+	}
+
+	public static async createExpense(
+		workspaceId: string,
+		data: CreateExpenseRequestBody
+	): Promise<Expense> {
+		const res = await this.http.post(`/v1/workspaces/${workspaceId}/expenses`, data);
+		return res.data satisfies Expense;
+	}
+
+	public static async getExpenseCategories(
+		workspaceId: string,
+		filter?: GetExpenseCategoriesFilter
+	): Promise<ExpenseCategoriesResponse> {
+		const q = qs.stringify(filter, { encodeValuesOnly: true });
+		const res = await this.http.get(`/v1/workspaces/${workspaceId}/expenses/categories?${q}`);
+		return res.data satisfies ExpenseCategoriesResponse;
+	}
+
+	public static async addExpenseCategory() {}
+	public static async deleteExpenseCategory() {}
+	public static async updateExpenseCategory() {}
+	public static async archiveExpenseCategory() {}
+	public static async deleteExpense() {}
+	public static async getExpense() {}
+	public static async updateExpense() {}
+	public static async downloadReceipt() {}
+	//#endregion
 	//TODO Invoice
 	//#region Projects
 	public static async getProjects(

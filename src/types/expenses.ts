@@ -1,19 +1,60 @@
 import { Duration } from './duration';
+import { ExpenseCategory } from './expense-category';
 import { Project } from './project';
 
-export type ExpenseCategory = {
-	archived: boolean;
-	hasUnitPrice: boolean;
+export type GetExpensesFilter = {
+	/**
+	 * @default 1
+	 */
+	page?: number;
+
+	/**
+	 * [1..200]
+	 * @default 50
+	 */
+	'page-size'?: number;
+
+	userId?: string;
+};
+
+export type ExpensesResponse = {
+	dailyTotals: ExpenseDailyTotals[];
+	expenses: ExpensesWithCount;
+	weeklyTotals: ExpenseWeeklyTotals[];
+};
+
+export type ExpenseDailyTotals = {
+	date: string;
+	dateAsInstant: string;
+	total: number;
+};
+export type ExpensesWithCount = {
+	count: number;
+	expenses: ExpenseHydrated[];
+};
+export type ExpenseWeeklyTotals = {
+	date: string;
+	total: number;
+};
+
+export type Expense = {
+	billable: boolean;
+	categoryId: string;
+	date: string;
+	fileId: string;
 	id: string;
-	name: string;
-	priceInCents: number;
-	unit: string;
+	locked: boolean;
+	notes: string;
+	projectId: string;
+	quantity: number;
+	total: number;
+	userId: string;
 	workspaceId: string;
 };
 
 export type ExpenseHydrated = {
 	approvalRequestId: string;
-	bollable: boolean;
+	billable: boolean;
 	category: ExpenseCategory;
 	date: string;
 	fileId: string;
@@ -31,4 +72,16 @@ export type ExpenseHydrated = {
 export type EstimateRequest = {
 	estimate: Duration;
 	type: 'AUTO' | 'MANUAL';
+};
+
+export type CreateExpenseRequestBody = {
+	amount?: number;
+	billable?: boolean;
+	categoryId?: string;
+	date?: string;
+	file?: string;
+	/** [0..3000] */
+	notes?: string;
+	projectId?: string;
+	userId?: string;
 };
