@@ -117,11 +117,14 @@ import {
 	AddInvoiceRequestBody,
 	AddInvoiceResponse,
 	ChangeInvoiceLanguageRequestData,
+	ChangeInvoiceStatusRequestBody,
 	FilterInvoiceResponse,
 	FilterInvoicesRequestBody,
 	GetInvoicesFilter,
+	Invoice,
 	InvoiceOtherLanguageResponse,
 	InvoicesResponse,
+	SendInvoiceRequestBody,
 } from './types/invoice';
 
 const BASE_URL = 'https://api.clockify.me/api/v1';
@@ -636,6 +639,48 @@ export class Clockify {
 		data: ChangeInvoiceLanguageRequestData
 	): Promise<void> {
 		await this.http.put(`/workspaces/${workspaceId}/invoices/settings`, data);
+	}
+
+	public static async deleteInvoice(workspaceId: string, invoiceId: string): Promise<Invoice> {
+		const res = await this.http.delete(`/workspaces/${workspaceId}/invoices/${invoiceId}`);
+		return res.data satisfies Invoice;
+	}
+
+	public static async getInvoice(workspaceId: string, invoiceId: string): Promise<Invoice> {
+		const res = await this.http.get(`/workspaces/${workspaceId}/invoices/${invoiceId}`);
+		return res.data satisfies Invoice;
+	}
+
+	public static async sendInvoice(
+		workspaceId: string,
+		invoiceId: string,
+		data: SendInvoiceRequestBody
+	): Promise<Invoice> {
+		const res = await this.http.put(`/workspaces/${workspaceId}/invoices/${invoiceId}`, data);
+		return res.data satisfies Invoice;
+	}
+
+	public static async duplicateInvoice(workspaceId: string, invoiceId: string): Promise<Invoice> {
+		const res = await this.http.post(`/workspace/${workspaceId}/invoices/${invoiceId}`);
+		return res.data satisfies Invoice;
+	}
+
+	public static async exportInvoice(
+		workspaceId: string,
+		invoiceId: string,
+		userLocale: string
+	): Promise<string[]> {
+		const q = qs.stringify({ userLocale }, { encodeValuesOnly: true });
+		const res = await this.http.get(`/workspaces/${workspaceId}/invoices/${invoiceId}/export?${q}`);
+		return res.data satisfies string[];
+	}
+
+	public static async changeInvoiceStatus(
+		workspaceId: string,
+		invoiceId: string,
+		data: ChangeInvoiceStatusRequestBody
+	): Promise<void> {
+		await this.http.patch(`/workspaces/${workspaceId}/invoices/${invoiceId}/status`, data);
 	}
 	//#endregion
 	//#region Projects

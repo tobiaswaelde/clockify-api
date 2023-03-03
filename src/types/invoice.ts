@@ -64,6 +64,7 @@ export type InvoiceItem = {
 };
 
 export type Invoice = BaseInvoice & {
+	amount: number;
 	billFrom: string;
 	clientAddress: string;
 	companyId: string;
@@ -223,4 +224,23 @@ export type ChangeInvoiceLanguageRequestData = {
 	defaults: InvoiceDefaultSettingsRequest;
 	exportFields?: InvoiceExportFieldsRequest;
 	labels: LabelsCustomizationRequest;
+};
+
+export type SendInvoiceRequestBody = {
+	clientId?: string;
+	companyId?: string;
+	currency: string;
+	discountPercent?: number;
+	dueDate?: string;
+	issuedDate?: string;
+	note?: string;
+	number: string;
+	subject?: string;
+	tax2Percent?: number;
+	taxPercent?: number;
+	visibleZeroFields?: string[];
+};
+
+export type ChangeInvoiceStatusRequestBody = {
+	invoiceStatus: InvoiceStatus;
 };
