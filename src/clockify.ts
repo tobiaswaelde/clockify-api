@@ -12,6 +12,7 @@ import {
 	GetAssignmentsFilter,
 	GetProjectScheduledAssignmentsFilter,
 	GetScheduledAssignmentsFilter,
+	PublishAssignmentRequestBody,
 	ScheduledAssignment,
 } from './types/assignment';
 import { AuthType } from './types/auth';
@@ -43,6 +44,17 @@ import {
 	UpdateProjectRequestBody,
 	UpdateProjectTemplateRequestBody,
 } from './types/project';
+import {
+	ChangeRecurringAssignmentPeriodRequestBody,
+	CreateRecurringAssignmentRequestBody,
+	DeleteRecurringAssignmentRequestBody,
+	GetTotalUserCapacityRequestBody,
+	GetUserTotalCapacityFilter,
+	RecurringAssignment,
+	UserCapacity,
+	UpdateRecurringAssignmentRequestBody,
+	CopyScheduledAssignmentRequestBody,
+} from './types/recurring-assignment';
 import { AddTagRequestBody, GetTagsFilter, Tag, UpdateTagRequestBody } from './types/tag';
 import {
 	AddTaskParams,
@@ -702,14 +714,94 @@ export class Clockify {
 		return res.data satisfies ScheduledAssignment[];
 	}
 
-	public static async publishAssignment() {}
-	public static async createRecurringAssignment() {}
-	public static async deleteRecurringAssignment() {}
-	public static async updateRecurringAssignemnt() {}
-	public static async changeRecurringPeriod() {}
-	public static async getUsersTotalCapacity() {}
-	public static async getUserTotalCapacity() {}
-	public static async copyScheduledAssignment() {}
+	public static async publishAssignment(
+		workspaceId: string,
+		data: PublishAssignmentRequestBody
+	): Promise<void> {
+		await this.http.put(`/v1/workspaces/${workspaceId}/scheduling/assignments/publish`, data);
+	}
+
+	public static async createRecurringAssignment(
+		workspaceId: string,
+		data: CreateRecurringAssignmentRequestBody
+	): Promise<RecurringAssignment> {
+		const res = await this.http.post(
+			`/v1/workspaces/${workspaceId}/scheduling/assignments/recurring`,
+			data
+		);
+		return res.data satisfies RecurringAssignment;
+	}
+
+	public static async deleteRecurringAssignment(
+		workspaceId: string,
+		assignmentId: string,
+		data: DeleteRecurringAssignmentRequestBody
+	): Promise<RecurringAssignment[]> {
+		const res = await this.http.delete(
+			`/v1/workspaces/${workspaceId}/scheduling/assignments/recurring/${assignmentId}`,
+			{ data }
+		);
+		return res.data satisfies RecurringAssignment[];
+	}
+
+	public static async updateRecurringAssignemnt(
+		workspaceId: string,
+		assignmentId: string,
+		data: UpdateRecurringAssignmentRequestBody
+	): Promise<RecurringAssignment> {
+		const res = await this.http.patch(
+			`/v1/workspaces/${workspaceId}/scheduling/assignments/recurring/${assignmentId}`,
+			data
+		);
+		return res.data satisfies RecurringAssignment;
+	}
+
+	public static async changeRecurringPeriod(
+		workspaceId: string,
+		assignmentId: string,
+		data: ChangeRecurringAssignmentPeriodRequestBody
+	): Promise<RecurringAssignment> {
+		const res = await this.http.put(
+			`/v1/workspaces/${workspaceId}/scheduling/assignments/series/${assignmentId}`,
+			data
+		);
+		return res.data satisfies RecurringAssignment;
+	}
+
+	public static async getUsersTotalCapacity(
+		workspaceId: string,
+		data: GetTotalUserCapacityRequestBody
+	): Promise<UserCapacity> {
+		const res = await this.http.post(
+			`/v1/workspaces/${workspaceId}/scheduling/assignments/user-filter/totals`,
+			data
+		);
+		return res.data satisfies UserCapacity;
+	}
+
+	public static async getUserTotalCapacity(
+		workspaceId: string,
+		userId: string,
+		filter: GetUserTotalCapacityFilter
+	): Promise<UserCapacity> {
+		const q = qs.stringify(filter, { encodeValuesOnly: true });
+		const res = await this.http.get(
+			`/v1/workspaces/${workspaceId}/scheduling/assignment/users/${userId}/totals?${q}`
+		);
+		return res.data satisfies UserCapacity;
+	}
+
+	public static async copyScheduledAssignment(
+		workspaceId: string,
+		assignmentId: string,
+		data: CopyScheduledAssignmentRequestBody
+	): Promise<RecurringAssignment> {
+		const res = await this.http.post(
+			`/v1/workspaces/${workspaceId}/scheduling/assignments/${assignmentId}/copy`,
+			data
+		);
+		return res.data satisfies RecurringAssignment;
+	}
 	//#endregion
 	//#region Tags
 	public static async getTags(workspaceId: string, options?: GetTagsFilter): Promise<Tag[]> {
