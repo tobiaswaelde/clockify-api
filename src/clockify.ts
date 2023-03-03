@@ -1,3 +1,5 @@
+import axios from 'axios';
+import * as qs from 'qs';
 import {
 	GetExpenseCategoriesFilter,
 	ExpenseCategoriesResponse,
@@ -6,8 +8,6 @@ import {
 	UpdateExpenseCategoryRequestBody,
 	ArchiveExpenseCategoryRequestBody,
 } from './types/expense-category';
-import axios from 'axios';
-import * as qs from 'qs';
 import {
 	ApprovalRequest,
 	ApprovalRequestResponse,
@@ -116,9 +116,11 @@ import {
 import {
 	AddInvoiceRequestBody,
 	AddInvoiceResponse,
+	ChangeInvoiceLanguageRequestData,
 	FilterInvoiceResponse,
 	FilterInvoicesRequestBody,
 	GetInvoicesFilter,
+	InvoiceOtherLanguageResponse,
 	InvoicesResponse,
 } from './types/invoice';
 
@@ -602,7 +604,7 @@ export class Clockify {
 		filter?: GetInvoicesFilter
 	): Promise<InvoicesResponse> {
 		const q = qs.stringify(filter, { encodeValuesOnly: true });
-		const res = await this.http.get(`/workspaces/${workspaceId}/invoices`);
+		const res = await this.http.get(`/workspaces/${workspaceId}/invoices?${q}`);
 		return res.data satisfies InvoicesResponse;
 	}
 
@@ -620,6 +622,20 @@ export class Clockify {
 	): Promise<FilterInvoiceResponse> {
 		const res = await this.http.post(`/workspaces/${workspaceId}/invoices/info`, data);
 		return res.data satisfies FilterInvoiceResponse;
+	}
+
+	public static async getInvoiceInOtherLanguage(
+		workspaceId: string
+	): Promise<InvoiceOtherLanguageResponse> {
+		const res = await this.http.get(`/workspaces/${workspaceId}/invoices/settings`);
+		return res.data satisfies InvoiceOtherLanguageResponse;
+	}
+
+	public static async updateInvoiceLanguage(
+		workspaceId: string,
+		data: ChangeInvoiceLanguageRequestData
+	): Promise<void> {
+		await this.http.put(`/workspaces/${workspaceId}/invoices/settings`, data);
 	}
 	//#endregion
 	//#region Projects

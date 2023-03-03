@@ -119,3 +119,108 @@ export type FilterInvoiceResponse = {
 	invoices: InvoiceInfo[];
 	total: number;
 };
+
+export type InvoiceDefaultSettings = {
+	companyId: string;
+	defaultImportExpenseItemTypeId: string;
+	defaultImportTimeItemTypeId: string;
+	dueDays: number;
+	itemTypeId: string;
+	notes: string;
+	subject: string;
+	/**
+	 * @deprecated
+	 */
+	tax: number;
+	/**
+	 * @deprecated
+	 */
+	tax2: number;
+	taxPercent: number;
+	tax2Percent: number;
+	taxType: string;
+};
+export type InvoiceDefaultSettingsRequest = {
+	companyId?: string;
+	dueDays?: number;
+	itemTypeId?: string;
+	notes: string;
+	subject: string;
+	tax2Percent?: number;
+	taxPercent?: number;
+	taxType?: 'COMPOUND' | 'SIMPLE' | 'NONE';
+};
+export type InvoiceExportFields = {
+	itemType: boolean;
+	quantity: boolean;
+	rtl: boolean;
+	unitPrice: boolean;
+};
+export type InvoiceExportFieldsRequest = {
+	RTL?: boolean;
+	itemType?: boolean;
+	quantity?: boolean;
+	rtl?: boolean;
+	unitPrice?: boolean;
+};
+export type LabelsCustomization = {
+	amount: string;
+	billFrom: string;
+	billTo: string;
+	description: string;
+	discounts: string;
+	dueDate: string;
+	issueDate: string;
+	itemType: string;
+	notes: string;
+	quantity: string;
+	subtotal: string;
+	tax: string;
+	tax2: string;
+	totalAmount: string;
+	unitPrice: string;
+};
+export type LabelsCustomizationRequest = {
+	/** [0..20] characters */
+	amount?: string;
+	/** [0..20] characters */
+	billFrom?: string;
+	/** [0..20] characters */
+	billTo?: string;
+	/** [0..20] characters */
+	description?: string;
+	/** [0..20] characters */
+	discounts?: string;
+	/** [0..20] characters */
+	dueDate?: string;
+	/** [0..20] characters */
+	issueDate?: string;
+	/** [0..20] characters */
+	itemType?: string;
+	/** [0..20] characters */
+	notes?: string;
+	/** [0..20] characters */
+	quantity?: string;
+	/** [0..20] characters */
+	subtotal?: string;
+	/** [0..20] characters */
+	tax?: string;
+	/** [0..20] characters */
+	tax2?: string;
+	/** [0..20] characters */
+	totalAmount?: string;
+	/** [0..20] characters */
+	unitPrice?: string;
+};
+
+export type InvoiceOtherLanguageResponse = {
+	defaults: InvoiceDefaultSettings;
+	exportFields: InvoiceExportFields;
+	labels: LabelsCustomization;
+};
+
+export type ChangeInvoiceLanguageRequestData = {
+	defaults: InvoiceDefaultSettingsRequest;
+	exportFields?: InvoiceExportFieldsRequest;
+	labels: LabelsCustomizationRequest;
+};
