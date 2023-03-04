@@ -1,1 +1,3 @@
-console.log('hello world');
+import { Clockify } from './clockify';
+
+export default { Clockify };

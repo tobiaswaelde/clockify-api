@@ -1,10 +1,24 @@
 {
-  "name": "clockify-api",
-  "version": "0.0.1",
+  "name": "clockify-sdk",
+  "version": "0.1.0",
   "description": "API for accessing Clockify",
-  "main": "index.js",
+  "author": {
+    "name": "Tobias Wälde",
+    "email": "tobias.waelde@gmail.com",
+    "url": "https://tobiaswaelde.com"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "files": [
+    "dist/*"
+  ],
   "repository": "git@github.com:tobiaswaelde/clockify-api.git",
-  "author": "Tobias Wälde <tobias.waelde@gmail.com>",
+  "keywords": [
+    "clockify",
+    "api",
+    "javascript",
+    "typescript"
+  ],
   "license": "MIT",
   "private": false,
   "devDependencies": {
